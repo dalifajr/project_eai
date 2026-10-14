@@ -69,6 +69,25 @@ class WebhookController extends Controller
             ], 200);
         }
 
+        if ($event === 'payment.revoked') {
+            $nim = $data['nim'] ?? null;
+            if ($nim) {
+                $wisuda = PendaftaranWisuda::where('nim', $nim)->latest()->first();
+                if ($wisuda) {
+                    $wisuda->update([
+                        'status_pembayaran' => 'unpaid',
+                        'status_pendaftaran' => 'menunggu_pembayaran',
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => 'acknowledged',
+                'code' => 200,
+                'message' => 'Payment revoke webhook processed successfully.',
+            ], 200);
+        }
+
         return response()->json([
             'status' => 'ignored',
             'code' => 200,
