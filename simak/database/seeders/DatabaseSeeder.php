@@ -16,13 +16,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Admin Akademik
-        User::create([
-            'name' => 'Administrator SIMAK',
-            'username' => 'admin',
-            'email' => 'admin@simak.kampus.id',
-            'role' => 'admin',
-            'password' => Hash::make('password123'),
-        ]);
+        User::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Administrator SIMAK',
+                'email' => 'admin@simak.kampus.id',
+                'role' => 'admin',
+                'password' => Hash::make('password123'),
+            ]
+        );
 
         // 2. Data Mahasiswa & Akun Mahasiswa
         $dataMahasiswa = [
@@ -99,16 +101,21 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($dataMahasiswa as $mhs) {
-            Mahasiswa::create($mhs);
+            Mahasiswa::updateOrCreate(
+                ['nim' => $mhs['nim']],
+                $mhs
+            );
 
-            User::create([
-                'name' => $mhs['nama'],
-                'username' => $mhs['nim'],
-                'email' => $mhs['nim'] . '@student.kampus.id',
-                'role' => 'mahasiswa',
-                'nim' => $mhs['nim'],
-                'password' => Hash::make('password123'),
-            ]);
+            User::updateOrCreate(
+                ['username' => $mhs['nim']],
+                [
+                    'name' => $mhs['nama'],
+                    'email' => $mhs['nim'] . '@student.kampus.id',
+                    'role' => 'mahasiswa',
+                    'nim' => $mhs['nim'],
+                    'password' => Hash::make('password123'),
+                ]
+            );
         }
 
         // 3. Data Mata Kuliah & Jadwal Kuliah
@@ -204,7 +211,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($mataKuliah as $mk) {
-            MataKuliah::create($mk);
+            MataKuliah::updateOrCreate(
+                ['kode_mk' => $mk['kode_mk']],
+                $mk
+            );
         }
     }
 }

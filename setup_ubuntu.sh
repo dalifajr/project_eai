@@ -149,26 +149,40 @@ if ! command -v composer &> /dev/null; then
     rm -f /tmp/composer-setup.php
 fi
 
-# Deteksi Service PHP-FPM Aktif
-PHP_FPM_SOCK=$(ls -1 /var/run/php/php*-fpm.sock 2>/dev/null | head -n 1 || true)
-PHP_SERVICE=$(systemctl list-unit-files | grep -oE "php[0-9.]+-fpm\.service" | head -n 1 | sed 's/\.service//' || true)
-if [ -z "$PHP_SERVICE" ]; then
-    PHP_SERVICE="php-fpm"
-fi
-
-echo -e "${GREEN}Deteksi PHP-FPM Service: ${PHP_SERVICE}${NC}"
-echo -e "${GREEN}Deteksi FastCGI Socket : ${PHP_FPM_SOCK}${NC}"
-
-# Aktifkan dan jalankan services
+# Aktifkan dan jalankan services utama
 systemctl enable nginx
 systemctl start nginx
 systemctl enable mariadb
 systemctl start mariadb
-if systemctl list-unit-files | grep -q "$PHP_SERVICE"; then
-    systemctl enable "$PHP_SERVICE"
-    systemctl restart "$PHP_SERVICE"
+
+# Deteksi Service PHP-FPM Aktif
+PHP_SERVICE=$(systemctl list-unit-files | grep -oE "php[0-9.]+-fpm\.service" | head -n 1 | sed 's/\.service//' || true)
+if [ -z "$PHP_SERVICE" ]; then
+    PHP_SERVICE=$(systemctl list-units --type=service --all | grep -oE "php[0-9.]+-fpm" | head -n 1 || true)
+fi
+if [ -z "$PHP_SERVICE" ]; then
+    PHP_SERVICE="php-fpm"
 fi
 
+if systemctl list-unit-files | grep -q "$PHP_SERVICE" || systemctl list-units --type=service --all | grep -q "$PHP_SERVICE"; then
+    systemctl enable "$PHP_SERVICE" || true
+    systemctl restart "$PHP_SERVICE" || true
+    sleep 1
+fi
+
+# Deteksi Socket FastCGI PHP-FPM Aktif
+PHP_FPM_SOCK=$(ls -1 /run/php/php*-fpm.sock /var/run/php/php*-fpm.sock 2>/dev/null | head -n 1 || true)
+if [ -z "$PHP_FPM_SOCK" ] || [ ! -S "$PHP_FPM_SOCK" ]; then
+    PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;' 2>/dev/null || echo "8.3")
+    if [ -S "/run/php/php${PHP_VER}-fpm.sock" ]; then
+        PHP_FPM_SOCK="/run/php/php${PHP_VER}-fpm.sock"
+    elif [ -S "/var/run/php/php${PHP_VER}-fpm.sock" ]; then
+        PHP_FPM_SOCK="/var/run/php/php${PHP_VER}-fpm.sock"
+    fi
+fi
+
+echo -e "${GREEN}Deteksi PHP-FPM Service: ${PHP_SERVICE}${NC}"
+echo -e "${GREEN}Deteksi FastCGI Socket : ${PHP_FPM_SOCK}${NC}"
 echo -e "${GREEN}✓ Dependensi dasar berhasil diinstal.${NC}"
 
 # ------------------------------------------------------------------------------
@@ -357,31 +371,35 @@ if [ -f "/var/www/billing/composer.json" ]; then
     echo -e "${GREEN}✓ Total Billing System berhasil dimigrasi dan diseed.${NC}\n"
 fi
 
-# Permissions
+# Permissions (Optimasi Cepat: Hindari fork find -exec yang lambat)
+echo -e "${CYAN}--> Mengonfigurasi hak akses file & direktori web server...${NC}"
 chown -R www-data:www-data /var/www/simak /var/www/billing
-find /var/www/simak -type f -exec chmod 664 {} \;
-find /var/www/simak -type d -exec chmod 775 {} \;
-find /var/www/billing -type f -exec chmod 664 {} \;
-find /var/www/billing -type d -exec chmod 775 {} \;
+chmod -R 755 /var/www/simak /var/www/billing
 chmod -R 775 /var/www/simak/storage /var/www/simak/bootstrap/cache
 chmod -R 775 /var/www/billing/storage /var/www/billing/bootstrap/cache
+echo -e "${GREEN}✓ Hak akses direktori & storage berhasil dikonfigurasi.${NC}\n"
 
 # ------------------------------------------------------------------------------
 # 7. KONFIGURASI NGINX VIRTUAL HOST
 # ------------------------------------------------------------------------------
 echo -e "\n${BOLD}${YELLOW}--- TAHAP 7: MENYIAPKAN KONFIGURASI NGINX ---${NC}"
 
-# Fallback socket jika belum terdeteksi
-if [ -z "$PHP_FPM_SOCK" ]; then
-    PHP_FPM_SOCK="/var/run/php/php-fpm.sock"
+# Validasi socket PHP-FPM aktif sebelum dipasang ke Nginx
+if [ -z "$PHP_FPM_SOCK" ] || [ ! -S "$PHP_FPM_SOCK" ]; then
+    PHP_FPM_SOCK=$(ls -1 /run/php/php*-fpm.sock /var/run/php/php*-fpm.sock 2>/dev/null | head -n 1 || true)
 fi
+if [ -z "$PHP_FPM_SOCK" ]; then
+    PHP_VER=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;' 2>/dev/null || echo "8.3")
+    PHP_FPM_SOCK="/var/run/php/php${PHP_VER}-fpm.sock"
+fi
+echo -e "${CYAN}FastCGI PHP-FPM Socket yang digunakan: ${PHP_FPM_SOCK}${NC}"
 
-# VirtualHost SIMAK
+# VirtualHost SIMAK (Mendukung akses domain dan akses langsung IP Server Port 80)
 cat > /etc/nginx/sites-available/simak.conf <<EOL
 server {
-    listen 80;
-    listen [::]:80;
-    server_name ${DOMAIN_SIMAK};
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name ${DOMAIN_SIMAK} _ "";
     root /var/www/simak/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
@@ -400,10 +418,9 @@ server {
     location = /favicon.ico { access_log off; log_not_found off; }
     location = /robots.txt  { access_log off; log_not_found off; }
 
-    error_page 404 /index.php;
-
     location ~ \.php$ {
         fastcgi_pass unix:${PHP_FPM_SOCK};
+        fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
@@ -415,7 +432,7 @@ server {
 }
 EOL
 
-# VirtualHost Total Billing System
+# VirtualHost Total Billing System (Mendukung akses domain Port 80 dan akses IP Port 8001)
 cat > /etc/nginx/sites-available/billing.conf <<EOL
 server {
     listen 80;
@@ -439,10 +456,44 @@ server {
     location = /favicon.ico { access_log off; log_not_found off; }
     location = /robots.txt  { access_log off; log_not_found off; }
 
-    error_page 404 /index.php;
+    location ~ \.php$ {
+        fastcgi_pass unix:${PHP_FPM_SOCK};
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_hide_header X-Powered-By;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+
+server {
+    listen 8001 default_server;
+    listen [::]:8001 default_server;
+    server_name _;
+    root /var/www/billing/public;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+    add_header X-XSS-Protection "1; mode=block";
+
+    index index.php index.html;
+    charset utf-8;
+
+    client_max_body_size 64M;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
 
     location ~ \.php$ {
         fastcgi_pass unix:${PHP_FPM_SOCK};
+        fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
@@ -501,11 +552,17 @@ else
     echo -e "${YELLOW}Perhatian: Script bin/eai belum dapat disalin otomatis.${NC}"
 fi
 
-# Konfigurasi UFW Firewall
+# Konfigurasi UFW Firewall (Membuka port web 80, 443, dan 8001)
 if command -v ufw &> /dev/null; then
     ufw allow 'Nginx Full' >/dev/null 2>&1 || true
+    ufw allow 80/tcp >/dev/null 2>&1 || true
+    ufw allow 443/tcp >/dev/null 2>&1 || true
+    ufw allow 8001/tcp >/dev/null 2>&1 || true
     ufw allow OpenSSH >/dev/null 2>&1 || true
 fi
+
+# Dapatkan IP Server Publik
+SERVER_IP=$(curl -s -4 --max-time 3 https://ifconfig.me 2>/dev/null || ip route get 1.1.1.1 2>/dev/null | awk '{print $7}' || echo "IP_SERVER")
 
 # ------------------------------------------------------------------------------
 # 10. SELESAI & RINGKASAN
@@ -516,9 +573,14 @@ echo "====================================================================="
 echo "        INSTALASI EKOSISTEM EAI BERHASIL DISELESAIKAN!               "
 echo "====================================================================="
 echo -e "${NC}"
-echo -e "Kedua aplikasi telah aktif dan siap diakses melalui peramban:"
-echo -e "  1. ${BOLD}SIMAK UNIVERSE${NC}        : ${CYAN}https://${DOMAIN_SIMAK}${NC}"
-echo -e "  2. ${BOLD}Total Billing System${NC}  : ${CYAN}https://${DOMAIN_BILLING}${NC}"
+echo -e "Kedua aplikasi telah aktif dan dapat diakses melalui peramban:"
+echo -e "  1. ${BOLD}SIMAK UNIVERSE (Portal Mahasiswa & Akademik)${NC}"
+echo -e "     - Domain  : ${CYAN}http(s)://${DOMAIN_SIMAK}${NC}"
+echo -e "     - IP Langsung: ${CYAN}http://${SERVER_IP}/${NC}"
+echo ""
+echo -e "  2. ${BOLD}Total Billing System (Keuangan Kampus)${NC}"
+echo -e "     - Domain  : ${CYAN}http(s)://${DOMAIN_BILLING}${NC}"
+echo -e "     - IP Langsung: ${CYAN}http://${SERVER_IP}:8001/${NC}"
 echo ""
 echo -e "${BOLD}KREDENSIAL LOGIN DEFAULT:${NC}"
 echo -e "  - SIMAK Mahasiswa (Dzulfikri) : NIM 210101001 / Pass: password123"
