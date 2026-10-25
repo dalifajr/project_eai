@@ -30,12 +30,13 @@ echo "====================================================================="
 echo -e "${NC}"
 echo -e "Script ini kompatibel dengan Ubuntu 20.04, 22.04, 24.04, dan 26 Minimal."
 echo -e "Tahapan eksekusi:"
-echo -e "  1. Pembersihan repo broken & instalasi dependensi OS (Nginx, PHP, MariaDB, Certbot)"
-echo -e "  2. Pembuatan basis data 'db_simak' dan 'db_billing'"
-echo -e "  3. Konfigurasi Domain & VirtualHost Nginx untuk SIMAK dan Billing"
-echo -e "  4. Setup SSL / HTTPS otomatis via Let's Encrypt Certbot"
-echo -e "  5. Instalasi website, migrasi database & seeding data awal"
-echo -e "  6. Pemasangan custom CLI command 'eai' di sistem (/usr/local/bin/eai)\n"
+echo -e "  1. Alokasi Swap Memory 2GB (Anti-Stuck OOM di server minimal)"
+echo -e "  2. Pembersihan repo broken & instalasi dependensi OS (Nginx, PHP, MariaDB, Certbot)"
+echo -e "  3. Pembuatan basis data 'db_simak' dan 'db_billing'"
+echo -e "  4. Konfigurasi Domain & VirtualHost Nginx untuk SIMAK dan Billing"
+echo -e "  5. Setup SSL / HTTPS otomatis via Let's Encrypt Certbot"
+echo -e "  6. Instalasi website, migrasi database & seeding data (Anti-Deadlock)"
+echo -e "  7. Pemasangan custom CLI command 'eai' di sistem (/usr/local/bin/eai)\n"
 
 # ------------------------------------------------------------------------------
 # 1. FORMULIR INPUT KONFIGURASI
@@ -79,9 +80,31 @@ if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
 fi
 
 # ------------------------------------------------------------------------------
-# 2. DETEKSI OS, PEMBERSIHAN PPA & INSTALASI DEPENDENSI
+# 2. ALOKASI SWAP MEMORY (PENCEGAHAN STUCK / OOM DI SERVER MINIMAL)
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 2: DETEKSI OS & MENGINSTAL DEPENDENSI ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 2: MEMERIKSA ALOKASI MEMORI SERVER ---${NC}"
+SWAP_TOTAL=$(free -m | awk '/^Swap:/ {print $2}')
+if [ "$SWAP_TOTAL" -eq 0 ]; then
+    echo -e "${CYAN}Membuat Swapfile 2GB untuk mencegah kehabisan RAM saat proses Seeding...${NC}"
+    if fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 2>/dev/null; then
+        chmod 600 /swapfile
+        mkswap /swapfile >/dev/null 2>&1
+        swapon /swapfile >/dev/null 2>&1
+        if ! grep -q "/swapfile" /etc/fstab; then
+            echo '/swapfile none swap sw 0 0' >> /etc/fstab
+        fi
+        echo -e "${GREEN}✓ Swapfile 2GB berhasil diaktifkan.${NC}"
+    else
+        echo -e "${YELLOW}Catatan: Alokasi swapfile dilewati.${NC}"
+    fi
+else
+    echo -e "${GREEN}✓ Memori swap telah tersedia: ${SWAP_TOTAL}MB.${NC}"
+fi
+
+# ------------------------------------------------------------------------------
+# 3. DETEKSI OS, PEMBERSIHAN PPA & INSTALASI DEPENDENSI
+# ------------------------------------------------------------------------------
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 3: DETEKSI OS & MENGINSTAL DEPENDENSI ---${NC}"
 export DEBIAN_FRONTEND=noninteractive
 
 # Deteksi codename Ubuntu
@@ -98,7 +121,6 @@ apt-get install -y software-properties-common curl git unzip ufw ca-certificates
 
 # Kebijakan PHP Repository:
 # Pada Ubuntu 26 (resolute), repositori resmi Ubuntu telah menyediakan PHP terbaru langsung.
-# Hanya pasang ppa:ondrej/php pada Ubuntu jammy (22.04), noble (24.04), atau focal (20.04).
 if [ "$UBUNTU_CODENAME" = "jammy" ] || [ "$UBUNTU_CODENAME" = "noble" ] || [ "$UBUNTU_CODENAME" = "focal" ]; then
     echo -e "${CYAN}Menambahkan PPA PHP untuk Ubuntu ${UBUNTU_CODENAME}...${NC}"
     add-apt-repository -y ppa:ondrej/php || true
@@ -107,7 +129,7 @@ else
     echo -e "${GREEN}Ubuntu ${UBUNTU_CODENAME} menggunakan repositori PHP resmi bawaan sistem.${NC}"
 fi
 
-# Instalasi Nginx, MariaDB, Certbot & Paket PHP Generik
+# Instalasi Nginx, MariaDB, Certbot & Paket PHP
 echo -e "${CYAN}Menginstal Nginx, MariaDB, Certbot & PHP Modules...${NC}"
 apt-get install -y nginx mariadb-server certbot python3-certbot-nginx \
     php-fpm php-cli php-common php-mysql php-zip php-gd \
@@ -150,23 +172,30 @@ fi
 echo -e "${GREEN}✓ Dependensi dasar berhasil diinstal.${NC}"
 
 # ------------------------------------------------------------------------------
-# 3. KONFIGURASI BASIS DATA MARIADB / MYSQL
+# 4. KONFIGURASI BASIS DATA MARIADB / MYSQL
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 3: MENYIAPKAN BASIS DATA MYSQL ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 4: MENYIAPKAN BASIS DATA MYSQL ---${NC}"
+
+# Pastikan MySQL siap menerima query
+systemctl restart mariadb
+sleep 2
 
 mysql -e "CREATE DATABASE IF NOT EXISTS db_simak CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -e "CREATE DATABASE IF NOT EXISTS db_billing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -e "CREATE USER IF NOT EXISTS 'eai_user'@'localhost' IDENTIFIED BY '${DB_PASS}';"
+mysql -e "CREATE USER IF NOT EXISTS 'eai_user'@'127.0.0.1' IDENTIFIED BY '${DB_PASS}';"
 mysql -e "GRANT ALL PRIVILEGES ON db_simak.* TO 'eai_user'@'localhost';"
 mysql -e "GRANT ALL PRIVILEGES ON db_billing.* TO 'eai_user'@'localhost';"
+mysql -e "GRANT ALL PRIVILEGES ON db_simak.* TO 'eai_user'@'127.0.0.1';"
+mysql -e "GRANT ALL PRIVILEGES ON db_billing.* TO 'eai_user'@'127.0.0.1';"
 mysql -e "FLUSH PRIVILEGES;"
 
 echo -e "${GREEN}✓ Basis data 'db_simak' dan 'db_billing' telah siap.${NC}"
 
 # ------------------------------------------------------------------------------
-# 4. DEPLOY KODE SUMBER KE /var/www/
+# 5. DEPLOY KODE SUMBER KE /var/www/
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 4: MENYIAPKAN DIREKTORI & SUMBER APLIKASI ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 5: MENYIAPKAN DIREKTORI & SUMBER APLIKASI ---${NC}"
 
 mkdir -p /var/www/simak
 mkdir -p /var/www/billing
@@ -180,7 +209,7 @@ if [ -d "$SCRIPT_DIR/simak" ] && [ -d "$SCRIPT_DIR/billing" ]; then
     cp -r "$SCRIPT_DIR/billing/." /var/www/billing/
 fi
 
-# Generate File .env untuk SIMAK
+# Generate File .env untuk SIMAK (Menggunakan SESSION_DRIVER=file & CACHE_STORE=file agar anti-stuck)
 echo -e "${CYAN}Mengonfigurasi file .env untuk SIMAK Portal...${NC}"
 cat > /var/www/simak/.env <<EOL
 APP_NAME="SIMAK UNIVERSE"
@@ -196,7 +225,7 @@ APP_FAKER_LOCALE=id_ID
 
 APP_MAINTENANCE_DRIVER=file
 
-BCRYPT_ROUNDS=12
+BCRYPT_ROUNDS=10
 
 LOG_CHANNEL=stack
 LOG_STACK=single
@@ -210,7 +239,7 @@ DB_DATABASE=db_simak
 DB_USERNAME=eai_user
 DB_PASSWORD=${DB_PASS}
 
-SESSION_DRIVER=database
+SESSION_DRIVER=file
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
@@ -218,9 +247,9 @@ SESSION_DOMAIN=null
 
 BROADCAST_CONNECTION=log
 FILESYSTEM_DISK=local
-QUEUE_CONNECTION=database
+QUEUE_CONNECTION=sync
 
-CACHE_STORE=database
+CACHE_STORE=file
 CACHE_PREFIX=simak_cache_
 
 # Konfigurasi EAI Integration Endpoint ke Total Billing
@@ -244,7 +273,7 @@ APP_FAKER_LOCALE=id_ID
 
 APP_MAINTENANCE_DRIVER=file
 
-BCRYPT_ROUNDS=12
+BCRYPT_ROUNDS=10
 
 LOG_CHANNEL=stack
 LOG_STACK=single
@@ -258,7 +287,7 @@ DB_DATABASE=db_billing
 DB_USERNAME=eai_user
 DB_PASSWORD=${DB_PASS}
 
-SESSION_DRIVER=database
+SESSION_DRIVER=file
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
@@ -266,9 +295,9 @@ SESSION_DOMAIN=null
 
 BROADCAST_CONNECTION=log
 FILESYSTEM_DISK=local
-QUEUE_CONNECTION=database
+QUEUE_CONNECTION=sync
 
-CACHE_STORE=database
+CACHE_STORE=file
 CACHE_PREFIX=billing_cache_
 
 # Konfigurasi EAI Integration Webhook ke SIMAK Portal
@@ -277,26 +306,55 @@ SIMAK_WEBHOOK_SECRET=eai_secret_webhook_token_2026
 EOL
 
 # ------------------------------------------------------------------------------
-# 5. MENJALANKAN COMPOSER, APP KEY & MIGRASI DATABASE
+# 6. MENJALANKAN COMPOSER, APP KEY & DATABASE MIGRATE / SEED (ANTI-STUCK)
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 5: RUNNING COMPOSER, APP KEY & DATABASE MIGRATE ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 6: MENJALANKAN COMPOSER & SEEDING BASIS DATA ---${NC}"
+
+# Pengecekan Kesiapan Koneksi MySQL
+echo -e "${CYAN}Memvalidasi koneksi ke basis data MySQL...${NC}"
+for i in {1..15}; do
+    if mysql -u eai_user -p"${DB_PASS}" -h 127.0.0.1 -e "SELECT 1;" >/dev/null 2>&1; then
+        echo -e "${GREEN}✓ Basis data siap menerima instruksi migrasi.${NC}"
+        break
+    fi
+    sleep 1
+done
+
+export COMPOSER_ALLOW_SUPERUSER=1
+export COMPOSER_MEMORY_LIMIT=-1
 
 # Setup SIMAK
 if [ -f "/var/www/simak/composer.json" ]; then
-    echo -e "${CYAN}Menginstal paket Composer pada SIMAK...${NC}"
+    echo -e "${CYAN}--> [1/4] Menginstal paket Composer pada SIMAK...${NC}"
     cd /var/www/simak
     composer install --no-dev --optimize-autoloader --no-interaction
-    php artisan key:generate --force
-    php artisan migrate:fresh --seed --force
+    
+    echo -e "${CYAN}--> [2/4] Generate Application Key SIMAK...${NC}"
+    php artisan key:generate --force --no-interaction
+
+    echo -e "${CYAN}--> [3/4] Menjalankan Migrasi Tabel SIMAK...${NC}"
+    php artisan migrate:fresh --force --no-interaction
+
+    echo -e "${CYAN}--> [4/4] Menjalankan Seeder Data Awal SIMAK...${NC}"
+    php artisan db:seed --force --no-interaction
+    echo -e "${GREEN}✓ SIMAK Portal berhasil dimigrasi dan diseed.${NC}\n"
 fi
 
 # Setup Billing
 if [ -f "/var/www/billing/composer.json" ]; then
-    echo -e "${CYAN}Menginstal paket Composer pada Total Billing...${NC}"
+    echo -e "${CYAN}--> [1/4] Menginstal paket Composer pada Total Billing...${NC}"
     cd /var/www/billing
     composer install --no-dev --optimize-autoloader --no-interaction
-    php artisan key:generate --force
-    php artisan migrate:fresh --seed --force
+
+    echo -e "${CYAN}--> [2/4] Generate Application Key Total Billing...${NC}"
+    php artisan key:generate --force --no-interaction
+
+    echo -e "${CYAN}--> [3/4] Menjalankan Migrasi Tabel Total Billing...${NC}"
+    php artisan migrate:fresh --force --no-interaction
+
+    echo -e "${CYAN}--> [4/4] Menjalankan Seeder Data Awal Total Billing...${NC}"
+    php artisan db:seed --force --no-interaction
+    echo -e "${GREEN}✓ Total Billing System berhasil dimigrasi dan diseed.${NC}\n"
 fi
 
 # Permissions
@@ -308,12 +366,10 @@ find /var/www/billing -type d -exec chmod 775 {} \;
 chmod -R 775 /var/www/simak/storage /var/www/simak/bootstrap/cache
 chmod -R 775 /var/www/billing/storage /var/www/billing/bootstrap/cache
 
-echo -e "${GREEN}✓ Sumber kode, dependensi, dan migrasi basis data selesai.${NC}"
-
 # ------------------------------------------------------------------------------
-# 6. KONFIGURASI NGINX VIRTUAL HOST
+# 7. KONFIGURASI NGINX VIRTUAL HOST
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 6: MENYIAPKAN KONFIGURASI NGINX ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 7: MENYIAPKAN KONFIGURASI NGINX ---${NC}"
 
 # Fallback socket jika belum terdeteksi
 if [ -z "$PHP_FPM_SOCK" ]; then
@@ -410,9 +466,9 @@ systemctl reload nginx
 echo -e "${GREEN}✓ Konfigurasi VirtualHost Nginx berhasil dipasang.${NC}"
 
 # ------------------------------------------------------------------------------
-# 7. KONFIGURASI SSL / HTTPS (LET'S ENCRYPT CERTBOT)
+# 8. KONFIGURASI SSL / HTTPS (LET'S ENCRYPT CERTBOT)
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 7: MENGONFIGURASI SERTIFIKAT SSL (HTTPS) ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 8: MENGONFIGURASI SERTIFIKAT SSL (HTTPS) ---${NC}"
 echo -e "Mencoba menginstal sertifikat SSL otomatis melalui Let's Encrypt Certbot..."
 
 if certbot --nginx -d "${DOMAIN_SIMAK}" -d "${DOMAIN_BILLING}" --non-interactive --agree-tos -m "${ADMIN_EMAIL}" --redirect; then
@@ -428,9 +484,9 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 8. MEMASANG CUSTOM COMMAND 'eai'
+# 9. MEMASANG CUSTOM COMMAND 'eai'
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 8: MEMASANG CUSTOM COMMAND 'eai' ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 9: MEMASANG CUSTOM COMMAND 'eai' ---${NC}"
 
 if [ -f "$SCRIPT_DIR/bin/eai" ]; then
     cp "$SCRIPT_DIR/bin/eai" /usr/local/bin/eai
@@ -452,7 +508,7 @@ if command -v ufw &> /dev/null; then
 fi
 
 # ------------------------------------------------------------------------------
-# 9. SELESAI & RINGKASAN
+# 10. SELESAI & RINGKASAN
 # ------------------------------------------------------------------------------
 clear
 echo -e "${GREEN}${BOLD}"
@@ -478,6 +534,7 @@ echo -e "  - ${CYAN}eai restart${NC}        : Merestart seluruh service server"
 echo -e "  - ${CYAN}eai reload${NC}         : Reload Nginx dan PHP tanpa downtime"
 echo -e "  - ${CYAN}eai update${NC}         : Git pull, composer install, migrate & cache"
 echo -e "  - ${CYAN}eai migrate${NC}        : Menjalankan migrasi database"
+echo -e "  - ${CYAN}eai seed${NC}           : Menjalankan seeding database"
 echo -e "  - ${CYAN}eai logs simak${NC}     : Memantau live error log SIMAK"
 echo -e "  - ${CYAN}eai logs billing${NC}   : Memantau live error log Total Billing"
 echo -e "  - ${CYAN}eai backup${NC}         : Membuat backup dump SQL basis data"
