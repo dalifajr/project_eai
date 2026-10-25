@@ -3,74 +3,154 @@
 @section('title', 'Masuk ke Portal Akademik')
 
 @section('content')
-<div style="max-width: 440px; margin: 40px auto;">
-    <div class="card" style="padding: 32px;">
-        <div style="text-align: center; margin-bottom: 24px;">
-            <div style="width: 48px; height: 48px; background: var(--primary); color: #fff; font-weight: 700; font-size: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; margin-bottom: 12px;">
+<div style="max-width: 960px; margin: 30px auto; display: grid; grid-template-columns: 1fr 1.35fr; gap: 32px; align-items: start;">
+    <!-- Sisi Kiri: Form Login Standar -->
+    <div class="card-modern" style="padding: 30px;">
+        <div style="margin-bottom: 24px;">
+            <div style="width: 44px; height: 44px; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: #fff; font-weight: 800; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);">
                 S
             </div>
-            <h2 style="font-size: 20px; font-weight: 700;">Masuk ke SIMAK UNIVERSE</h2>
+            <h1 style="font-size: 20px; font-weight: 800; color: var(--text-heading); letter-spacing: -0.02em;">Masuk ke SIMAK</h1>
             <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Sistem Informasi Akademik Terintegrasi EAI</p>
         </div>
 
         <form action="{{ route('login.post') }}" method="POST">
             @csrf
             <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">NIM atau Username</label>
-                <input type="text" name="username" value="{{ old('username') }}" required autofocus
-                       style="width: 100%; height: 44px; padding: 0 14px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-heading); margin-bottom: 6px;">
+                    NIM ATAU USERNAME
+                </label>
+                <input type="text" name="username" value="{{ old('username') }}" required autofocus placeholder="Masukkan NIM atau username"
+                       style="width: 100%; height: 42px; padding: 0 14px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: 14px; font-family: var(--font-sans); background: #ffffff; color: var(--text-heading); outline: none;">
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Kata Sandi</label>
-                <input type="password" name="password" required
-                       style="width: 100%; height: 44px; padding: 0 14px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 14px;">
-                <small style="color: var(--text-muted); font-size: 11px; display: block; margin-top: 4px;">Kata sandi default: <code>password123</code></small>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-heading); margin-bottom: 6px;">
+                    KATA SANDI
+                </label>
+                <input type="password" name="password" required placeholder="Masukkan kata sandi"
+                       style="width: 100%; height: 42px; padding: 0 14px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-size: 14px; font-family: var(--font-sans); background: #ffffff; color: var(--text-heading); outline: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                    <span style="font-size: 11px; color: var(--text-muted);">Default: <code>password123</code></span>
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Masuk ke Sistem</button>
+            <button type="submit" class="btn-modern primary" style="width: 100%; font-size: 14px; height: 44px;">
+                Masuk ke Portal Akademik &rarr;
+            </button>
         </form>
 
-        <div style="margin-top: 28px; padding-top: 20px; border-top: 1px dashed var(--border-color);">
-            <p style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Pilih Akun Demo Pengujian Skenario:</p>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <a href="{{ route('quick.login', '210101001') }}" class="btn btn-outline" style="justify-content: flex-start; text-align: left; height: auto; padding: 8px 12px; font-size: 12px;">
+        <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-muted); text-align: center;">
+            Terhubung ke Total Billing System di port <code>8001</code>
+        </div>
+    </div>
+
+    <!-- Sisi Kanan: Quick Switcher Skenario Pengujian EAI -->
+    <div>
+        <div style="margin-bottom: 14px;">
+            <span class="badge-pill brand" style="margin-bottom: 6px;">SKENARIO PENGUJIAN INSTAN</span>
+            <h2 style="font-size: 18px; font-weight: 800; color: var(--text-heading);">Pilih Akun Demo Integrasi EAI</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                Klik salah satu kartu di bawah ini untuk langsung masuk tanpa perlu mengetik kredensial:
+            </p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Persona 1: Dzulfikri (UKT Belum Lunas) -->
+            <a href="{{ route('quick.login', '210101001') }}" style="text-decoration: none; color: inherit;">
+                <div class="card-modern" style="padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #ef4444; transition: all 0.15s ease;">
                     <div>
-                        <strong>Dzulfikri (210101001)</strong>
-                        <div style="font-size: 11px; color: var(--danger);">Skenario: UKT Belum Lunas (Form KRS Terkunci)</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 14px; color: var(--text-heading);">Dzulfikri Alifajri</strong>
+                            <code style="font-size: 11px;">210101001</code>
+                        </div>
+                        <p style="font-size: 12px; color: var(--status-danger-text); margin-top: 2px;">
+                            Skenario 1: UKT Semester 7 Belum Lunas (Form KRS Terkunci EAI)
+                        </p>
                     </div>
-                </a>
-                <a href="{{ route('quick.login', '210101002') }}" class="btn btn-outline" style="justify-content: flex-start; text-align: left; height: auto; padding: 8px 12px; font-size: 12px;">
+                    <span class="badge-pill danger">UKT UNPAID</span>
+                </div>
+            </a>
+
+            <!-- Persona 2: Budi (UKT Lunas) -->
+            <a href="{{ route('quick.login', '210101002') }}" style="text-decoration: none; color: inherit;">
+                <div class="card-modern" style="padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #10b981; transition: all 0.15s ease;">
                     <div>
-                        <strong>Budi Santoso (210101002)</strong>
-                        <div style="font-size: 11px; color: var(--success);">Skenario: UKT Lunas (Bisa Isi KRS)</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 14px; color: var(--text-heading);">Budi Santoso</strong>
+                            <code style="font-size: 11px;">210101002</code>
+                        </div>
+                        <p style="font-size: 12px; color: var(--status-success-text); margin-top: 2px;">
+                            Skenario 2: UKT Lunas (Akses Pengisian KRS Terbuka Penuh)
+                        </p>
                     </div>
-                </a>
-                <a href="{{ route('quick.login', '210101003') }}" class="btn btn-outline" style="justify-content: flex-start; text-align: left; height: auto; padding: 8px 12px; font-size: 12px;">
+                    <span class="badge-pill success">UKT PAID</span>
+                </div>
+            </a>
+
+            <!-- Persona 3: Siti (Wisuda - Skripsi Belum) -->
+            <a href="{{ route('quick.login', '210101003') }}" style="text-decoration: none; color: inherit;">
+                <div class="card-modern" style="padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #f59e0b; transition: all 0.15s ease;">
                     <div>
-                        <strong>Siti Rahmawati (210101003)</strong>
-                        <div style="font-size: 11px; color: var(--warning);">Skenario Wisuda: Skripsi Belum Selesai</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 14px; color: var(--text-heading);">Siti Rahmawati</strong>
+                            <code style="font-size: 11px;">210101003</code>
+                        </div>
+                        <p style="font-size: 12px; color: var(--status-warning-text); margin-top: 2px;">
+                            Skenario Wisuda: Skripsi Belum Lulus (Wisuda Ditolak Tahap 1)
+                        </p>
                     </div>
-                </a>
-                <a href="{{ route('quick.login', '200101004') }}" class="btn btn-outline" style="justify-content: flex-start; text-align: left; height: auto; padding: 8px 12px; font-size: 12px;">
+                    <span class="badge-pill warning">SKRIPSI BELUM</span>
+                </div>
+            </a>
+
+            <!-- Persona 4: Ahmad (Wisuda - Ada Tunggakan Denda) -->
+            <a href="{{ route('quick.login', '200101004') }}" style="text-decoration: none; color: inherit;">
+                <div class="card-modern" style="padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #dc2626; transition: all 0.15s ease;">
                     <div>
-                        <strong>Ahmad Fauzan (200101004)</strong>
-                        <div style="font-size: 11px; color: var(--danger);">Skenario Wisuda: Lulus Skripsi tapi Ada Denda</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 14px; color: var(--text-heading);">Ahmad Fauzan</strong>
+                            <code style="font-size: 11px;">200101004</code>
+                        </div>
+                        <p style="font-size: 12px; color: var(--status-danger-text); margin-top: 2px;">
+                            Skenario Wisuda: Skripsi Lulus, Namun Dihambat Tunggakan Denda
+                        </p>
                     </div>
-                </a>
-                <a href="{{ route('quick.login', '200101005') }}" class="btn btn-outline" style="justify-content: flex-start; text-align: left; height: auto; padding: 8px 12px; font-size: 12px;">
+                    <span class="badge-pill danger">ADA DENDA</span>
+                </div>
+            </a>
+
+            <!-- Persona 5: Rina (Wisuda Siap Bayar & Webhook) -->
+            <a href="{{ route('quick.login', '200101005') }}" style="text-decoration: none; color: inherit;">
+                <div class="card-modern" style="padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #2563eb; transition: all 0.15s ease;">
                     <div>
-                        <strong>Rina Kusuma (200101005)</strong>
-                        <div style="font-size: 11px; color: var(--primary);">Skenario Wisuda: Siap Bayar VA Wisuda & Callback Webhook</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 14px; color: var(--text-heading);">Rina Kusuma</strong>
+                            <code style="font-size: 11px;">200101005</code>
+                        </div>
+                        <p style="font-size: 12px; color: var(--brand-primary); margin-top: 2px;">
+                            Skenario Wisuda: Siap Bayar VA Wisuda & Simulasi Webhook Callback
+                        </p>
                     </div>
-                </a>
-                <a href="{{ route('quick.login', 'admin') }}" class="btn btn-outline" style="justify-content: flex-start; text-align: left; height: auto; padding: 8px 12px; font-size: 12px;">
+                    <span class="badge-pill brand">SIAP WISUDA</span>
+                </div>
+            </a>
+
+            <!-- Persona 6: Admin -->
+            <a href="{{ route('quick.login', 'admin') }}" style="text-decoration: none; color: inherit;">
+                <div class="card-modern" style="padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #475569; transition: all 0.15s ease;">
                     <div>
-                        <strong>Administrator SIMAK (admin)</strong>
-                        <div style="font-size: 11px; color: var(--text-muted);">Lihat Rekap Seluruh Mahasiswa</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 14px; color: var(--text-heading);">Administrator Kampus</strong>
+                            <code style="font-size: 11px;">admin</code>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                            Dashboard Admin: Rekapitulasi Mahasiswa, Status KRS & Wisuda
+                        </p>
                     </div>
-                </a>
-            </div>
+                    <span class="badge-pill neutral">ADMIN PORTAL</span>
+                </div>
+            </a>
         </div>
     </div>
 </div>

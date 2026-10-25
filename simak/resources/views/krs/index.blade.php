@@ -3,105 +3,134 @@
 @section('title', 'Pengisian Kartu Rencana Studi (KRS)')
 
 @section('content')
-<div style="margin-bottom: 24px;">
-    <h2 style="font-size: 22px; font-weight: 700;">Pengisian Kartu Rencana Studi (KRS)</h2>
-    <p style="color: var(--text-muted); font-size: 14px;">Semester {{ $mahasiswa->semester_sekarang }} Tahun Akademik 2026/2027</p>
+<!-- Page Header Info -->
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+    <div>
+        <span class="badge-pill brand" style="margin-bottom: 6px;">PORTAL RENCANA STUDI</span>
+        <h1 style="font-size: 24px; font-weight: 800; color: var(--text-heading); letter-spacing: -0.02em;">
+            Pengisian Kartu Rencana Studi (KRS)
+        </h1>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+            Semester {{ $mahasiswa->semester_sekarang }} &bull; Batas Beban: <strong>{{ $mahasiswa->batas_sks }} SKS</strong> (IPS Lalu: {{ $mahasiswa->ips_lalu }})
+        </p>
+    </div>
+    <div>
+        @if($akademikAktif && $uktStatus['is_paid'])
+            <span class="badge-pill success" style="padding: 6px 14px; font-size: 12px;">Akses KRS: TERBUKA</span>
+        @else
+            <span class="badge-pill danger" style="padding: 6px 14px; font-size: 12px;">Akses KRS: TERKUNCI</span>
+        @endif
+    </div>
 </div>
 
 <!-- 1. Validasi Status Akademik Mahasiswa -->
 @if(!$akademikAktif)
-    <div class="card" style="border-left: 4px solid var(--danger);">
+    <div class="card-modern" style="border-left: 4px solid #ef4444; background: #fff5f5;">
         <div style="display: flex; gap: 16px; align-items: flex-start;">
             <div style="font-size: 28px;">🚫</div>
             <div>
-                <h3 style="font-size: 16px; font-weight: 700; color: var(--danger);">Akses Pengisian KRS Ditolak</h3>
-                <p style="font-size: 14px; margin-top: 4px;">{{ $pesanAkademik }}</p>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--status-danger-text);">Akses Pengisian KRS Ditolak</h3>
+                <p style="font-size: 13px; color: #991b1b; margin-top: 4px;">{{ $pesanAkademik }}</p>
             </div>
         </div>
     </div>
 @else
     <!-- 2. Validasi Status Pembayaran UKT via EAI Total Billing System -->
     @if(!$uktStatus['is_paid'])
-        <!-- FORM KRS TERKUNCI (UKT BELUM LUNAS) -->
-        <div class="card" style="border-left: 4px solid #b45309; background-color: #fffbeb;">
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-                <div style="font-size: 32px;">🔒</div>
+        <!-- FORM KRS TERKUNCI KARENA UKT BELUM LUNAS -->
+        <div class="card-modern" style="border-left: 4px solid #f59e0b; background: #fffdf9;">
+            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #fef3c7; color: #b45309; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">
+                    🔒
+                </div>
                 <div style="flex: 1;">
-                    <span class="badge badge-warning" style="margin-bottom: 8px;">INTEGRASI EAI: FORM KRS TERKUNCI</span>
-                    <h3 style="font-size: 18px; font-weight: 700; color: #b45309;">
-                        KRS Terkunci: Tagihan UKT Semester {{ $mahasiswa->semester_sekarang }} Belum Dilunasi
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <span class="badge-pill warning">INTEGRASI EAI TERTUTUP</span>
+                        <span class="badge-pill danger">STATUS: UNPAID</span>
+                    </div>
+
+                    <h3 style="font-size: 18px; font-weight: 800; color: #92400e; letter-spacing: -0.01em;">
+                        Formulir KRS Terkunci: Tagihan UKT Semester {{ $mahasiswa->semester_sekarang }} Belum Dilunasi
                     </h3>
-                    <p style="font-size: 14px; color: #78350f; margin-top: 6px;">
-                        Berdasarkan verifikasi sistem penagihan terpusat (Total Billing System), Anda belum melakukan pelunasan UKT semester ini. Pengisian KRS hanya dapat dibuka setelah pembayaran terverifikasi lunas.
+                    <p style="font-size: 13px; color: #78350f; margin-top: 4px; line-height: 1.6;">
+                        Berdasarkan verifikasi sistem penagihan terpusat (Total Billing System), Anda belum melakukan pelunasan UKT semester ini. Pengisian KRS ditutup secara otomatis oleh EAI sampai pembayaran diverifikasi lunas.
                     </p>
 
                     @if(isset($uktStatus['data']['nomor_va']))
-                    <div style="background: #ffffff; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 16px; margin: 16px 0; max-width: 520px;">
-                        <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Rincian Virtual Account UKT:</div>
+                    <div style="background: #ffffff; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 18px; margin: 18px 0; max-width: 520px; box-shadow: var(--shadow-xs);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Nomor Virtual Account Pembayaran:</span>
+                            <span class="badge-pill brand">Bank Mitra Kampus</span>
+                        </div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-                            <span style="font-size: 20px; font-weight: 700; color: #1e3a8a; letter-spacing: 0.05em;">
+                            <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: var(--brand-primary); letter-spacing: 0.04em;">
                                 {{ $uktStatus['data']['nomor_va'] }}
                             </span>
-                            <span class="badge badge-danger">STATUS: UNPAID</span>
+                            <button type="button" onclick="navigator.clipboard.writeText('{{ $uktStatus['data']['nomor_va'] }}'); alert('Nomor VA berhasil disalin!');" class="btn-modern secondary sm">
+                                Salin VA
+                            </button>
                         </div>
-                        <div style="margin-top: 8px; font-size: 13px; color: var(--text-main); display: flex; justify-content: space-between;">
-                            <span>Nominal Tagihan:</span>
-                            <strong>Rp {{ number_format($uktStatus['data']['nominal'] ?? 0, 0, ',', '.') }}</strong>
+                        <div style="margin-top: 12px; font-size: 13px; color: var(--text-heading); display: flex; justify-content: space-between; border-top: 1px dashed #e2e8f0; padding-top: 8px;">
+                            <span>Nominal Kewajiban:</span>
+                            <strong style="font-size: 15px; color: #0f172a;">Rp {{ number_format($uktStatus['data']['nominal'] ?? 0, 0, ',', '.') }}</strong>
                         </div>
-                        <div style="margin-top: 4px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between;">
-                            <span>Batas Jatuh Tempo:</span>
+                        <div style="margin-top: 4px; font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between;">
+                            <span>Batas Waktu Pelunasan:</span>
                             <span>{{ $uktStatus['data']['jatuh_tempo'] ?? '-' }}</span>
                         </div>
                     </div>
                     @endif
 
-                    <div style="display: flex; gap: 12px; align-items: center; margin-top: 14px;">
-                        <a href="http://localhost:8001" target="_blank" class="btn btn-primary" style="background:#0284c7; font-size:13px;">
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <a href="http://localhost:8001" target="_blank" class="btn-modern primary" style="background:#0f766e; font-size:13px;">
                             Buka Billing Simulator untuk Simulasi Bayar UKT &rarr;
                         </a>
-                        <button onclick="location.reload()" class="btn btn-outline" style="font-size:13px;">
-                            Cek Ulang Status Pembayaran (Refresh)
+                        <button onclick="location.reload()" class="btn-modern secondary sm" style="font-size:13px;">
+                            Periksa Ulang Status Pembayaran (Refresh)
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     @else
-        <!-- UKT SUDAH LUNAS: FORM KRS TERBUKA -->
-        <div class="alert alert-success" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <strong>Verifikasi Pembayaran UKT: LUNAS</strong>
-                <span style="font-size: 13px; margin-left: 8px; color: var(--text-muted);">
-                    (Invoice: {{ $uktStatus['data']['nomor_invoice'] ?? '-' }} | Total: Rp {{ number_format($uktStatus['data']['nominal'] ?? 0, 0, ',', '.') }})
-                </span>
+        <!-- KONDISI UKT SUDAH LUNAS: FORM KRS TERBUKA -->
+        <div class="banner-alert success" style="justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">✓</span>
+                <div>
+                    <strong>Verifikasi Pembayaran UKT: Lunas (Tersinkronisasi)</strong>
+                    <div style="font-size: 12px; color: #065f46; margin-top: 2px;">
+                        Invoice: <code>{{ $uktStatus['data']['nomor_invoice'] ?? '-' }}</code> &bull; Nominal: <strong>Rp {{ number_format($uktStatus['data']['nominal'] ?? 0, 0, ',', '.') }}</strong>
+                    </div>
+                </div>
             </div>
-            <span class="badge badge-success">FORM KRS DIBUKA</span>
+            <span class="badge-pill success">PORTAL DIBUKA</span>
         </div>
 
         @if($krsAktif)
-            <!-- Tampilan KRS yang sudah tersimpan -->
-            <div class="card">
-                <div class="card-header">
+            <!-- Tampilan Kartu Rencana Studi Tersimpan -->
+            <div class="card-modern">
+                <div class="card-header-modern">
                     <div>
-                        <h3 class="card-title">Kartu Rencana Studi Tersimpan</h3>
-                        <p class="card-subtitle">Status: Disetujui Dosen Pembimbing Akademik</p>
+                        <h2 class="card-title-modern">Kartu Rencana Studi (KRS) Tersimpan</h2>
+                        <p class="card-subtitle-modern">Telah disetujui Dosen Pembimbing Akademik</p>
                     </div>
                     <div style="display: flex; gap: 8px;">
-                        <a href="{{ route('krs.cetak') }}" target="_blank" class="btn btn-primary" style="font-size: 13px; min-height: 38px;">
-                            Cetak Draft KRS
+                        <a href="{{ route('krs.cetak') }}" target="_blank" class="btn-modern secondary sm">
+                            Cetak Draft KRS &rarr;
                         </a>
                     </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table>
+                <div class="table-container-modern">
+                    <table class="table-modern">
                         <thead>
                             <tr>
-                                <th>No</th>
+                                <th style="width: 40px; text-align: center;">No</th>
                                 <th>Kode MK</th>
                                 <th>Nama Mata Kuliah</th>
-                                <th>SKS</th>
-                                <th>Hari / Waktu</th>
+                                <th>Bobot</th>
+                                <th>Jadwal Kuliah</th>
                                 <th>Ruangan</th>
                             </tr>
                         </thead>
@@ -109,17 +138,19 @@
                             @php $no = 1; @endphp
                             @foreach($krsAktif->details as $item)
                             <tr>
-                                <td>{{ $no++ }}</td>
-                                <td><strong>{{ $item->mataKuliah->kode_mk }}</strong></td>
-                                <td>{{ $item->mataKuliah->nama_mk }}</td>
-                                <td><span class="badge badge-secondary">{{ $item->mataKuliah->sks }} SKS</span></td>
+                                <td style="text-align: center; color: var(--text-muted);">{{ $no++ }}</td>
+                                <td><code>{{ $item->mataKuliah->kode_mk }}</code></td>
+                                <td><strong style="color: var(--text-heading);">{{ $item->mataKuliah->nama_mk }}</strong></td>
+                                <td><span class="badge-pill neutral">{{ $item->mataKuliah->sks }} SKS</span></td>
                                 <td>{{ $item->mataKuliah->hari }}, {{ substr($item->mataKuliah->jam_mulai, 0, 5) }} - {{ substr($item->mataKuliah->jam_selesai, 0, 5) }}</td>
                                 <td>{{ $item->mataKuliah->ruangan }}</td>
                             </tr>
                             @endforeach
-                            <tr style="background-color: #f8fafc; font-weight: 700;">
-                                <td colspan="3" style="text-align: right;">Total Beban SKS Terambil:</td>
-                                <td colspan="3"><span class="badge badge-success" style="font-size: 13px;">{{ $krsAktif->total_sks }} SKS</span></td>
+                            <tr style="background-color: var(--bg-subtle); font-weight: 700;">
+                                <td colspan="3" style="text-align: right; padding-right: 16px;">Total Beban SKS Terambil:</td>
+                                <td colspan="3">
+                                    <span class="badge-pill success" style="font-size: 13px;">{{ $krsAktif->total_sks }} SKS</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -128,32 +159,34 @@
         @endif
 
         <!-- Form Pemilihan Mata Kuliah Tawaran -->
-        <div class="card">
-            <div class="card-header">
+        <div class="card-modern">
+            <div class="card-header-modern">
                 <div>
-                    <h3 class="card-title">{{ $krsAktif ? 'Perbarui Pilihan Mata Kuliah' : 'Pilih Mata Kuliah Tawaran' }}</h3>
-                    <p class="card-subtitle">
-                        Batas Beban SKS Anda: <strong>{{ $mahasiswa->batas_sks }} SKS</strong> (Berdasarkan IPS semester lalu: {{ $mahasiswa->ips_lalu }})
+                    <h2 class="card-title-modern">{{ $krsAktif ? 'Perbarui Pilihan Mata Kuliah' : 'Pilih Mata Kuliah Tawaran' }}</h2>
+                    <p class="card-subtitle-modern">
+                        Batas Beban SKS Anda: <strong>{{ $mahasiswa->batas_sks }} SKS</strong> (Berdasarkan evaluasi akademik semester lalu)
                     </p>
                 </div>
-                <div id="sks-counter-badge" class="badge badge-secondary" style="font-size: 14px; padding: 6px 14px;">
-                    SKS Dipilih: <strong id="selected-sks" style="margin-left: 4px;">0</strong> / {{ $mahasiswa->batas_sks }}
+
+                <!-- Live Dynamic SKS Counter Badge -->
+                <div id="sks-counter-badge" class="badge-pill neutral" style="font-size: 13px; padding: 6px 16px;">
+                    SKS Dipilih: <strong id="selected-sks" style="margin-left: 4px; font-family: var(--font-mono);">0</strong> / {{ $mahasiswa->batas_sks }}
                 </div>
             </div>
 
             <form action="{{ route('krs.store') }}" method="POST" id="form-krs">
                 @csrf
-                <div class="table-responsive">
-                    <table>
+                <div class="table-container-modern">
+                    <table class="table-modern">
                         <thead>
                             <tr>
-                                <th style="width: 40px; text-align: center;">Pilih</th>
+                                <th style="width: 50px; text-align: center;">Pilih</th>
                                 <th>Kode</th>
                                 <th>Nama Mata Kuliah</th>
                                 <th>SKS</th>
-                                <th>Hari & Jadwal</th>
-                                <th>Ruangan</th>
-                                <th>Keterangan</th>
+                                <th>Hari & Jam Kuliah</th>
+                                <th>Ruang</th>
+                                <th>Keterangan Jadwal</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -161,7 +194,7 @@
                                 $selectedIds = $krsAktif ? $krsAktif->details->pluck('kode_mk')->toArray() : [];
                             @endphp
                             @foreach($mataKuliah as $mk)
-                            <tr>
+                            <tr class="mk-row">
                                 <td style="text-align: center;">
                                     <input type="checkbox" name="mata_kuliah[]" value="{{ $mk->kode_mk }}"
                                            data-sks="{{ $mk->sks }}"
@@ -169,19 +202,19 @@
                                            data-mulai="{{ $mk->jam_mulai }}"
                                            data-selesai="{{ $mk->jam_selesai }}"
                                            class="mk-checkbox"
-                                           style="width: 18px; height: 18px; cursor: pointer;"
+                                           style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--brand-primary);"
                                            {{ in_array($mk->kode_mk, $selectedIds) ? 'checked' : '' }}>
                                 </td>
-                                <td><strong>{{ $mk->kode_mk }}</strong></td>
-                                <td>{{ $mk->nama_mk }}</td>
-                                <td><span class="badge badge-secondary">{{ $mk->sks }} SKS</span></td>
+                                <td><code>{{ $mk->kode_mk }}</code></td>
+                                <td><strong style="color: var(--text-heading);">{{ $mk->nama_mk }}</strong></td>
+                                <td><span class="badge-pill neutral">{{ $mk->sks }} SKS</span></td>
                                 <td>
                                     <strong>{{ $mk->hari }}</strong>, {{ substr($mk->jam_mulai, 0, 5) }} - {{ substr($mk->jam_selesai, 0, 5) }}
                                 </td>
                                 <td>{{ $mk->ruangan }}</td>
                                 <td>
                                     @if($mk->kode_mk === 'TIF701' || $mk->kode_mk === 'TIF702')
-                                        <span style="font-size: 11px; color: var(--warning); font-weight: 600;">Jadwal Senin 08:00 (Uji Bentrok)</span>
+                                        <span class="badge-pill warning" style="font-size: 10px;">Senin 08:00 (Uji Bentrok)</span>
                                     @else
                                         <span style="font-size: 12px; color: var(--text-muted);">Tersedia</span>
                                     @endif
@@ -192,12 +225,12 @@
                     </table>
                 </div>
 
-                <div style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                    <div style="font-size: 13px; color: var(--text-muted);">
-                        Pastikan tidak memilih jadwal yang saling bertabrakan dan tidak melebihi {{ $mahasiswa->batas_sks }} SKS.
+                <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        Sistem EAI secara otomatis memvalidasi integritas jadwal dan batas kuota SKS.
                     </div>
-                    <button type="submit" class="btn btn-primary" id="btn-submit-krs">
-                        Simpan Kartu Rencana Studi (KRS)
+                    <button type="submit" class="btn-modern primary" id="btn-submit-krs">
+                        Simpan Rencana Studi (KRS) &rarr;
                     </button>
                 </div>
             </form>
@@ -217,8 +250,12 @@
         function calculateSks() {
             let total = 0;
             checkboxes.forEach(cb => {
+                const tr = cb.closest('tr');
                 if (cb.checked) {
                     total += parseInt(cb.getAttribute('data-sks') || 0);
+                    if (tr) tr.style.backgroundColor = '#f0fdf4';
+                } else {
+                    if (tr) tr.style.backgroundColor = '';
                 }
             });
 
@@ -228,11 +265,11 @@
 
             if (badgeEl) {
                 if (total > maxSks) {
-                    badgeEl.className = 'badge badge-danger';
+                    badgeEl.className = 'badge-pill danger';
                 } else if (total > 0) {
-                    badgeEl.className = 'badge badge-success';
+                    badgeEl.className = 'badge-pill success';
                 } else {
-                    badgeEl.className = 'badge badge-secondary';
+                    badgeEl.className = 'badge-pill neutral';
                 }
             }
         }
