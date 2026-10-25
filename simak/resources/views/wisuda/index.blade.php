@@ -32,18 +32,18 @@
 
         <!-- Step 2 -->
         <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: {{ !$syaratAkademikLengkap ? '#cbd5e1' : ($tunggakan['has_debt'] ? '#ef4444' : '#10b981') }}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
-                {{ !$syaratAkademikLengkap ? '2' : ($tunggakan['has_debt'] ? '!' : '✓') }}
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: {{ !$syaratAkademikLengkap ? '#cbd5e1' : (!empty($tunggakan['has_debt']) ? '#ef4444' : '#10b981') }}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
+                {{ !$syaratAkademikLengkap ? '2' : (!empty($tunggakan['has_debt']) ? '!' : '✓') }}
             </div>
             <div>
                 <div style="font-size: 12px; font-weight: 700; color: var(--text-heading);">Tahap 2: Bebas Tunggakan</div>
-                <div style="font-size: 11px; color: var(--text-muted);">{{ $tunggakan['has_debt'] ? 'Ada Denda' : 'Bebas Tunggakan' }}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ !$syaratAkademikLengkap ? 'Menunggu Tahap 1' : (!empty($tunggakan['has_debt']) ? 'Ada Denda' : 'Bebas Tunggakan') }}</div>
             </div>
         </div>
 
         <!-- Step 3 -->
         <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: {{ (!$syaratAkademikLengkap || $tunggakan['has_debt']) ? '#cbd5e1' : (($pendaftaran && $pendaftaran->status_pembayaran === 'paid') ? '#10b981' : '#f59e0b') }}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: {{ (!$syaratAkademikLengkap || !empty($tunggakan['has_debt'])) ? '#cbd5e1' : (($pendaftaran && $pendaftaran->status_pembayaran === 'paid') ? '#10b981' : '#f59e0b') }}; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">
                 {{ ($pendaftaran && $pendaftaran->status_pembayaran === 'paid') ? '✓' : '3' }}
             </div>
             <div>

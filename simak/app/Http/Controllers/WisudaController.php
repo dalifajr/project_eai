@@ -49,7 +49,11 @@ class WisudaController extends Controller
                 'mahasiswa' => $mahasiswa,
                 'syaratAkademikLengkap' => false,
                 'kekuranganSyarat' => $kekuranganSyarat,
-                'tunggakan' => null,
+                'tunggakan' => [
+                    'has_debt' => false,
+                    'total_tunggakan' => 0,
+                    'detail' => [],
+                ],
                 'pendaftaran' => null,
                 'tagihanWisuda' => null,
             ]);

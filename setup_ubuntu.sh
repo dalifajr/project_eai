@@ -2,7 +2,7 @@
 # ==============================================================================
 # Script Instalasi & Setup Otomatis Server Ubuntu
 # Ekosistem EAI: SIMAK UNIVERSE & TOTAL BILLING SYSTEM
-# Sistem Operasi Target: Ubuntu 20.04 / 22.04 / 24.04 LTS
+# Sistem Operasi Target: Ubuntu 20.04, 22.04, 24.04, & 26.04 (Resolute) Minimal
 # ==============================================================================
 
 set -e
@@ -28,8 +28,9 @@ echo "====================================================================="
 echo "   AUTOMASI DEPLOYMENT EAI (SIMAK & TOTAL BILLING SYSTEM) - UBUNTU   "
 echo "====================================================================="
 echo -e "${NC}"
-echo -e "Script ini akan mengonfigurasi server Ubuntu Anda dari awal, meliputi:"
-echo -e "  1. Instalasi Nginx, PHP 8.2 FPM, MariaDB, Composer & Certbot"
+echo -e "Script ini kompatibel dengan Ubuntu 20.04, 22.04, 24.04, dan 26 Minimal."
+echo -e "Tahapan eksekusi:"
+echo -e "  1. Pembersihan repo broken & instalasi dependensi OS (Nginx, PHP, MariaDB, Certbot)"
 echo -e "  2. Pembuatan basis data 'db_simak' dan 'db_billing'"
 echo -e "  3. Konfigurasi Domain & VirtualHost Nginx untuk SIMAK dan Billing"
 echo -e "  4. Setup SSL / HTTPS otomatis via Let's Encrypt Certbot"
@@ -78,21 +79,42 @@ if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
 fi
 
 # ------------------------------------------------------------------------------
-# 2. UPDATE SISTEM & INSTALASI DEPENDENSI
+# 2. DETEKSI OS, PEMBERSIHAN PPA & INSTALASI DEPENDENSI
 # ------------------------------------------------------------------------------
-echo -e "\n${BOLD}${YELLOW}--- TAHAP 2: MENGUPDATE SISTEM & MENGINSTAL DEPENDENSI ---${NC}"
+echo -e "\n${BOLD}${YELLOW}--- TAHAP 2: DETEKSI OS & MENGINSTAL DEPENDENSI ---${NC}"
 export DEBIAN_FRONTEND=noninteractive
+
+# Deteksi codename Ubuntu
+UBUNTU_CODENAME=$(lsb_release -sc 2>/dev/null || grep -oP '(?<=VERSION_CODENAME=).+' /etc/os-release || echo "unknown")
+echo -e "${CYAN}Terdeteksi versi Ubuntu: ${BOLD}${UBUNTU_CODENAME}${NC}"
+
+# Bersihkan PPA ondrej broken jika sebelumnya sempat gagal di Ubuntu resolute / versi baru
+echo -e "${CYAN}Membersihkan list repository lama yang tidak valid...${NC}"
+rm -f /etc/apt/sources.list.d/*ondrej* 2>/dev/null || true
+apt-get clean
 
 apt-get update -y
 apt-get install -y software-properties-common curl git unzip ufw ca-certificates lsb-release
 
-# Tambahkan Repository PPA PHP (Ondrej Sury) untuk stabilitas versi PHP
-echo -e "${CYAN}Menambahkan PPA PHP...${NC}"
-add-apt-repository -y ppa:ondrej/php
-apt-get update -y
+# Kebijakan PHP Repository:
+# Pada Ubuntu 26 (resolute), repositori resmi Ubuntu telah menyediakan PHP terbaru langsung.
+# Hanya pasang ppa:ondrej/php pada Ubuntu jammy (22.04), noble (24.04), atau focal (20.04).
+if [ "$UBUNTU_CODENAME" = "jammy" ] || [ "$UBUNTU_CODENAME" = "noble" ] || [ "$UBUNTU_CODENAME" = "focal" ]; then
+    echo -e "${CYAN}Menambahkan PPA PHP untuk Ubuntu ${UBUNTU_CODENAME}...${NC}"
+    add-apt-repository -y ppa:ondrej/php || true
+    apt-get update -y
+else
+    echo -e "${GREEN}Ubuntu ${UBUNTU_CODENAME} menggunakan repositori PHP resmi bawaan sistem.${NC}"
+fi
 
-# Instalasi Nginx, PHP 8.2, MariaDB & Utilitas
-echo -e "${CYAN}Menginstal Nginx, PHP 8.2 FPM, MariaDB & Certbot...${NC}"
+# Instalasi Nginx, MariaDB, Certbot & Paket PHP Generik
+echo -e "${CYAN}Menginstal Nginx, MariaDB, Certbot & PHP Modules...${NC}"
+apt-get install -y nginx mariadb-server certbot python3-certbot-nginx \
+    php-fpm php-cli php-common php-mysql php-zip php-gd \
+    php-mbstring php-curl php-xml php-bcmath php-intl || \
+apt-get install -y nginx mariadb-server certbot python3-certbot-nginx \
+    php8.3-fpm php8.3-cli php8.3-common php8.3-mysql php8.3-zip php8.3-gd \
+    php8.3-mbstring php8.3-curl php8.3-xml php8.3-bcmath php8.3-intl || \
 apt-get install -y nginx mariadb-server certbot python3-certbot-nginx \
     php8.2-fpm php8.2-cli php8.2-common php8.2-mysql php8.2-zip php8.2-gd \
     php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath php8.2-intl
@@ -105,13 +127,25 @@ if ! command -v composer &> /dev/null; then
     rm -f /tmp/composer-setup.php
 fi
 
-# Pastikan service utama berjalan
+# Deteksi Service PHP-FPM Aktif
+PHP_FPM_SOCK=$(ls -1 /var/run/php/php*-fpm.sock 2>/dev/null | head -n 1 || true)
+PHP_SERVICE=$(systemctl list-unit-files | grep -oE "php[0-9.]+-fpm\.service" | head -n 1 | sed 's/\.service//' || true)
+if [ -z "$PHP_SERVICE" ]; then
+    PHP_SERVICE="php-fpm"
+fi
+
+echo -e "${GREEN}Deteksi PHP-FPM Service: ${PHP_SERVICE}${NC}"
+echo -e "${GREEN}Deteksi FastCGI Socket : ${PHP_FPM_SOCK}${NC}"
+
+# Aktifkan dan jalankan services
 systemctl enable nginx
 systemctl start nginx
 systemctl enable mariadb
 systemctl start mariadb
-systemctl enable php8.2-fpm
-systemctl start php8.2-fpm
+if systemctl list-unit-files | grep -q "$PHP_SERVICE"; then
+    systemctl enable "$PHP_SERVICE"
+    systemctl restart "$PHP_SERVICE"
+fi
 
 echo -e "${GREEN}✓ Dependensi dasar berhasil diinstal.${NC}"
 
@@ -144,9 +178,6 @@ if [ -d "$SCRIPT_DIR/simak" ] && [ -d "$SCRIPT_DIR/billing" ]; then
     echo -e "${CYAN}Menyalin file aplikasi dari direktori lokal installer...${NC}"
     cp -r "$SCRIPT_DIR/simak/." /var/www/simak/
     cp -r "$SCRIPT_DIR/billing/." /var/www/billing/
-else
-    echo -e "${YELLOW}Folder proyek lokal tidak ditemukan di samping script.${NC}"
-    echo -e "Membuat direktori kerja kosong di /var/www/simak dan /var/www/billing."
 fi
 
 # Generate File .env untuk SIMAK
@@ -284,6 +315,11 @@ echo -e "${GREEN}✓ Sumber kode, dependensi, dan migrasi basis data selesai.${N
 # ------------------------------------------------------------------------------
 echo -e "\n${BOLD}${YELLOW}--- TAHAP 6: MENYIAPKAN KONFIGURASI NGINX ---${NC}"
 
+# Fallback socket jika belum terdeteksi
+if [ -z "$PHP_FPM_SOCK" ]; then
+    PHP_FPM_SOCK="/var/run/php/php-fpm.sock"
+fi
+
 # VirtualHost SIMAK
 cat > /etc/nginx/sites-available/simak.conf <<EOL
 server {
@@ -311,7 +347,7 @@ server {
     error_page 404 /index.php;
 
     location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        fastcgi_pass unix:${PHP_FPM_SOCK};
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
@@ -350,7 +386,7 @@ server {
     error_page 404 /index.php;
 
     location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        fastcgi_pass unix:${PHP_FPM_SOCK};
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
@@ -400,9 +436,6 @@ if [ -f "$SCRIPT_DIR/bin/eai" ]; then
     cp "$SCRIPT_DIR/bin/eai" /usr/local/bin/eai
 elif [ -f "/var/www/simak/../bin/eai" ]; then
     cp "/var/www/simak/../bin/eai" /usr/local/bin/eai
-else
-    # Fallback jika file bin/eai tidak ditemukan
-    curl -sS https://raw.githubusercontent.com/dalifajr/project_eai/main/bin/eai -o /usr/local/bin/eai || true
 fi
 
 if [ -f "/usr/local/bin/eai" ]; then

@@ -1,18 +1,22 @@
 # Panduan Lengkap Instalasi & Setup Server Ubuntu: SIMAK & Total Billing System
 
-Panduan ini disusun untuk memandu Helm dalam melakukan instalasi, konfigurasi domain, pengaktifan SSL (HTTPS), migrasi basis data, serta manajemen kedua aplikasi di server **Ubuntu (20.04 / 22.04 / 24.04 LTS)** menggunakan automated installer dan custom CLI command **`eai`**.
+Panduan ini disusun untuk memandu Helm dalam melakukan instalasi, konfigurasi domain, pengaktifan SSL (HTTPS), migrasi basis data, serta manajemen kedua aplikasi di server **Ubuntu (20.04, 22.04, 24.04, hingga 26.04 Resolute Minimal)** menggunakan automated installer dan custom CLI command **`eai`**.
 
 ---
 
 ## 1. Prasyarat Server & Domain
 
 Sebelum memulai proses instalasi di VPS/Server:
-1. **Sistem Operasi**: Ubuntu 20.04 LTS, 22.04 LTS, atau 24.04 LTS (Akses `root` atau `sudo`).
+1. **Sistem Operasi**: Ubuntu 20.04 LTS, 22.04 LTS, 24.04 LTS, atau **Ubuntu 26 Minimal (Resolute)** (Akses `root` atau `sudo`).
 2. **Koneksi Port**: Pastikan port `80` (HTTP), `443` (HTTPS), dan `22` (SSH) terbuka pada firewall penyedia VPS (Security Group / UFW).
 3. **DNS A Record (Domain / Subdomain)**:
    Arahkan DNS Record pada penyedia domain Anda ke IP Publik server:
    - `simak.domainanda.com` &rarr; `[IP Publik Server]`
    - `billing.domainanda.com` &rarr; `[IP Publik Server]`
+
+> [!NOTE]
+> **Khusus Ubuntu 26 (Resolute) Minimal**:
+> PPA lama `ppa:ondrej/php` di Launchpad tidak mendukung Ubuntu 26 dan akan menghasilkan error 404. Script `setup_ubuntu.sh` yang telah diperbarui secara cerdas mendeteksi Ubuntu 26 dan otomatis menggunakan paket PHP resmi bawaan sistem tanpa memerlukan PPA pihak ketiga. Jika sebelumnya Anda sempat mengalami error 404, script akan otomatis membersihkan file repo yang rusak tersebut.
 
 ---
 
