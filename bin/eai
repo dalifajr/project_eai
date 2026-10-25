@@ -1,0 +1,403 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# EAI CLI Management Tool
+# Enterprise Application Integration (SIMAK & Total Billing System)
+# Path Instalasi: /usr/local/bin/eai
+# ==============================================================================
+
+set -e
+
+# Warna Terminal
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Konfigurasi Path Default (Dapat disesuaikan jika path berbeda)
+SIMAK_PATH="${SIMAK_PATH:-/var/www/simak}"
+BILLING_PATH="${BILLING_PATH:-/var/www/billing}"
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/eai}"
+
+# Deteksi Versi PHP-FPM Aktif
+PHP_SERVICE=$(systemctl list-units --type=service --state=running | grep -oE "php[0-9.]+-fpm" | head -n 1)
+if [ -z "$PHP_SERVICE" ]; then
+    PHP_SERVICE=$(systemctl list-unit-files | grep -oE "php[0-9.]+-fpm" | sort -V | tail -n 1)
+fi
+PHP_SERVICE="${PHP_SERVICE:-php8.2-fpm}"
+
+# Header Banner
+print_header() {
+    echo -e "${CYAN}${BOLD}"
+    echo "====================================================================="
+    echo "       EAI MANAGEMENT CONTROLLER (SIMAK & TOTAL BILLING SYSTEM)      "
+    echo "====================================================================="
+    echo -e "${NC}"
+}
+
+# Fungsi: Menampilkan Status Sistem
+cmd_status() {
+    print_header
+    echo -e "${BOLD}1. STATUS LAYANAN UTAMA SERVER:${NC}"
+    
+    # Nginx
+    if systemctl is-active --quiet nginx; then
+        echo -e "  - Nginx Web Server     : ${GREEN}[ACTIVE / RUNNING]${NC}"
+    else
+        echo -e "  - Nginx Web Server     : ${RED}[INACTIVE / FAILED]${NC}"
+    fi
+
+    # PHP-FPM
+    if systemctl is-active --quiet "$PHP_SERVICE"; then
+        echo -e "  - PHP-FPM ($PHP_SERVICE) : ${GREEN}[ACTIVE / RUNNING]${NC}"
+    else
+        echo -e "  - PHP-FPM ($PHP_SERVICE) : ${RED}[INACTIVE / FAILED]${NC}"
+    fi
+
+    # MySQL / MariaDB
+    if systemctl is-active --quiet mysql || systemctl is-active --quiet mariadb; then
+        echo -e "  - MySQL / MariaDB      : ${GREEN}[ACTIVE / RUNNING]${NC}"
+    else
+        echo -e "  - MySQL / MariaDB      : ${RED}[INACTIVE / FAILED]${NC}"
+    fi
+    echo ""
+
+    echo -e "${BOLD}2. STATUS FOLDER APLIKASI:${NC}"
+    if [ -d "$SIMAK_PATH" ]; then
+        echo -e "  - SIMAK Portal         : ${GREEN}Ditemukan (${SIMAK_PATH})${NC}"
+    else
+        echo -e "  - SIMAK Portal         : ${RED}Tidak Ditemukan (${SIMAK_PATH})${NC}"
+    fi
+
+    if [ -d "$BILLING_PATH" ]; then
+        echo -e "  - Total Billing System : ${GREEN}Ditemukan (${BILLING_PATH})${NC}"
+    else
+        echo -e "  - Total Billing System : ${RED}Tidak Ditemukan (${BILLING_PATH})${NC}"
+    fi
+    echo ""
+
+    echo -e "${BOLD}3. INFORMASI SUMBER DAYA:${NC}"
+    echo -e "  - Ruang Disk Tersedia  : $(df -h / | awk 'NR==2 {print $4 " bebas dari " $2}')"
+    echo -e "  - Pemakaian RAM        : $(free -h | awk 'NR==2 {print $3 " / " $2}')"
+    echo ""
+}
+
+# Fungsi: Restart Layanan
+cmd_restart() {
+    local target="${1:-all}"
+    print_header
+    case "$target" in
+        nginx)
+            echo -e "${YELLOW}Merestart layanan Nginx...${NC}"
+            systemctl restart nginx
+            echo -e "${GREEN}✓ Nginx berhasil direstart.${NC}"
+            ;;
+        php)
+            echo -e "${YELLOW}Merestart layanan PHP-FPM ($PHP_SERVICE)...${NC}"
+            systemctl restart "$PHP_SERVICE"
+            echo -e "${GREEN}✓ PHP-FPM berhasil direstart.${NC}"
+            ;;
+        mysql)
+            echo -e "${YELLOW}Merestart layanan Database...${NC}"
+            systemctl restart mysql 2>/dev/null || systemctl restart mariadb
+            echo -e "${GREEN}✓ Database berhasil direstart.${NC}"
+            ;;
+        all)
+            echo -e "${YELLOW}Merestart seluruh layanan (Nginx, PHP-FPM, Database)...${NC}"
+            systemctl restart nginx
+            systemctl restart "$PHP_SERVICE"
+            systemctl restart mysql 2>/dev/null || systemctl restart mariadb 2>/dev/null || true
+            echo -e "${GREEN}✓ Seluruh layanan sistem berhasil direstart.${NC}"
+            ;;
+        *)
+            echo -e "${RED}Target restart tidak valid: $target${NC}"
+            echo -e "Pilihan yang tersedia: eai restart [all|nginx|php|mysql]"
+            exit 1
+            ;;
+    esac
+}
+
+# Fungsi: Reload Layanan (Zero Downtime)
+cmd_reload() {
+    print_header
+    echo -e "${YELLOW}Melakukan reload konfigurasi Nginx dan PHP-FPM...${NC}"
+    nginx -t
+    systemctl reload nginx
+    systemctl reload "$PHP_SERVICE"
+    echo -e "${GREEN}✓ Konfigurasi Nginx dan PHP-FPM berhasil direload tanpa downtime.${NC}"
+}
+
+# Fungsi: Update Kode & Dependensi
+cmd_update() {
+    print_header
+    echo -e "${BOLD}${YELLOW}=== MEMULAI PEMBARUAN APLIKASI (SIMAK & BILLING) ===${NC}\n"
+
+    # Update SIMAK
+    if [ -d "$SIMAK_PATH" ]; then
+        echo -e "${CYAN}--> Memperbarui SIMAK Portal (${SIMAK_PATH})...${NC}"
+        cd "$SIMAK_PATH"
+        if [ -d ".git" ]; then
+            echo "Menarik update git terbaru..."
+            git pull || echo -e "${YELLOW}Catatan: Git pull dilewati.${NC}"
+        fi
+        echo "Menginstal dependensi Composer..."
+        composer install --no-dev --optimize-autoloader --no-interaction
+        echo "Menjalankan migrasi database..."
+        php artisan migrate --force
+        echo "Mengoptimalkan cache konfigurasi dan view..."
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+        chown -R www-data:www-data "$SIMAK_PATH/storage" "$SIMAK_PATH/bootstrap/cache"
+        chmod -R 775 "$SIMAK_PATH/storage" "$SIMAK_PATH/bootstrap/cache"
+        echo -e "${GREEN}✓ SIMAK Portal berhasil diperbarui.${NC}\n"
+    fi
+
+    # Update Billing
+    if [ -d "$BILLING_PATH" ]; then
+        echo -e "${CYAN}--> Memperbarui Total Billing System (${BILLING_PATH})...${NC}"
+        cd "$BILLING_PATH"
+        if [ -d ".git" ]; then
+            echo "Menarik update git terbaru..."
+            git pull || echo -e "${YELLOW}Catatan: Git pull dilewati.${NC}"
+        fi
+        echo "Menginstal dependensi Composer..."
+        composer install --no-dev --optimize-autoloader --no-interaction
+        echo "Menjalankan migrasi database..."
+        php artisan migrate --force
+        echo "Mengoptimalkan cache konfigurasi dan view..."
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+        chown -R www-data:www-data "$BILLING_PATH/storage" "$BILLING_PATH/bootstrap/cache"
+        chmod -R 775 "$BILLING_PATH/storage" "$BILLING_PATH/bootstrap/cache"
+        echo -e "${GREEN}✓ Total Billing System berhasil diperbarui.${NC}\n"
+    fi
+
+    # Reload services
+    systemctl reload "$PHP_SERVICE" || true
+    echo -e "${GREEN}${BOLD}✓ Seluruh pembaruan aplikasi dan dependensi telah tuntas.${NC}"
+}
+
+# Fungsi: Migrasi Database
+cmd_migrate() {
+    local target="${1:-all}"
+    print_header
+
+    if [ "$target" = "simak" ] || [ "$target" = "all" ]; then
+        if [ -d "$SIMAK_PATH" ]; then
+            echo -e "${CYAN}Menjalankan migrasi database SIMAK...${NC}"
+            cd "$SIMAK_PATH"
+            php artisan migrate --force
+            echo -e "${GREEN}✓ Migrasi SIMAK selesai.${NC}\n"
+        fi
+    fi
+
+    if [ "$target" = "billing" ] || [ "$target" = "all" ]; then
+        if [ -d "$BILLING_PATH" ]; then
+            echo -e "${CYAN}Menjalankan migrasi database Total Billing System...${NC}"
+            cd "$BILLING_PATH"
+            php artisan migrate --force
+            echo -e "${GREEN}✓ Migrasi Total Billing System selesai.${NC}\n"
+        fi
+    fi
+}
+
+# Fungsi: Seed Database
+cmd_seed() {
+    local target="${1:-all}"
+    print_header
+
+    if [ "$target" = "simak" ] || [ "$target" = "all" ]; then
+        if [ -d "$SIMAK_PATH" ]; then
+            echo -e "${CYAN}Menjalankan database seeder SIMAK...${NC}"
+            cd "$SIMAK_PATH"
+            php artisan db:seed --force
+            echo -e "${GREEN}✓ Seeder SIMAK selesai.${NC}\n"
+        fi
+    fi
+
+    if [ "$target" = "billing" ] || [ "$target" = "all" ]; then
+        if [ -d "$BILLING_PATH" ]; then
+            echo -e "${CYAN}Menjalankan database seeder Total Billing System...${NC}"
+            cd "$BILLING_PATH"
+            php artisan db:seed --force
+            echo -e "${GREEN}✓ Seeder Total Billing System selesai.${NC}\n"
+        fi
+    fi
+}
+
+# Fungsi: Bersihkan Cache
+cmd_cache_clear() {
+    print_header
+    echo -e "${YELLOW}Membersihkan cache kedua aplikasi...${NC}"
+
+    if [ -d "$SIMAK_PATH" ]; then
+        echo "Membersihkan cache SIMAK..."
+        cd "$SIMAK_PATH"
+        php artisan optimize:clear
+    fi
+
+    if [ -d "$BILLING_PATH" ]; then
+        echo "Membersihkan cache Total Billing..."
+        cd "$BILLING_PATH"
+        php artisan optimize:clear
+    fi
+
+    echo -e "${GREEN}✓ Seluruh cache aplikasi telah dibersihkan.${NC}"
+}
+
+# Fungsi: Optimasi Cache Produksi
+cmd_cache_optimize() {
+    print_header
+    echo -e "${YELLOW}Membangun cache produksi untuk performa maksimal...${NC}"
+
+    if [ -d "$SIMAK_PATH" ]; then
+        echo "Mengoptimalkan SIMAK..."
+        cd "$SIMAK_PATH"
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+    fi
+
+    if [ -d "$BILLING_PATH" ]; then
+        echo "Mengoptimalkan Total Billing..."
+        cd "$BILLING_PATH"
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+    fi
+
+    echo -e "${GREEN}✓ Optimasi cache produksi berhasil diterapkan.${NC}"
+}
+
+# Fungsi: Pantau Log
+cmd_logs() {
+    local target="${1:-simak}"
+    print_header
+    case "$target" in
+        simak)
+            echo -e "${CYAN}Menampilkan live log SIMAK Portal (Ctrl+C untuk keluar)...${NC}"
+            tail -f -n 50 "$SIMAK_PATH/storage/logs/laravel.log"
+            ;;
+        billing)
+            echo -e "${CYAN}Menampilkan live log Total Billing System (Ctrl+C untuk keluar)...${NC}"
+            tail -f -n 50 "$BILLING_PATH/storage/logs/laravel.log"
+            ;;
+        nginx)
+            echo -e "${CYAN}Menampilkan live error log Nginx (Ctrl+C untuk keluar)...${NC}"
+            tail -f -n 50 /var/log/nginx/error.log
+            ;;
+        *)
+            echo -e "${RED}Target log tidak valid: $target${NC}"
+            echo -e "Pilihan: eai logs [simak|billing|nginx]"
+            exit 1
+            ;;
+    esac
+}
+
+# Fungsi: Perpanjang SSL Certbot
+cmd_ssl_renew() {
+    print_header
+    echo -e "${YELLOW}Menjalankan uji perpanjangan sertifikat SSL Let's Encrypt...${NC}"
+    certbot renew --dry-run
+    echo ""
+    echo -e "${YELLOW}Melakukan perpanjangan sertifikat aktual...${NC}"
+    certbot renew
+    systemctl reload nginx
+    echo -e "${GREEN}✓ Proses pembaruan sertifikat SSL selesai.${NC}"
+}
+
+# Fungsi: Backup Database
+cmd_backup() {
+    print_header
+    local timestamp=$(date +'%Y%m%d_%H%M%S')
+    mkdir -p "$BACKUP_DIR"
+    echo -e "${YELLOW}Membuat backup basis data ke ${BACKUP_DIR}...${NC}"
+
+    if command -v mysqldump >/dev/null 2>&1; then
+        echo "Mengekspor basis data SIMAK (db_simak)..."
+        mysqldump db_simak | gzip > "$BACKUP_DIR/db_simak_${timestamp}.sql.gz" 2>/dev/null || echo -e "${YELLOW}Peringatan: Gagal mengekspor db_simak.${NC}"
+
+        echo "Mengekspor basis data Total Billing (db_billing)..."
+        mysqldump db_billing | gzip > "$BACKUP_DIR/db_billing_${timestamp}.sql.gz" 2>/dev/null || echo -e "${YELLOW}Peringatan: Gagal mengekspor db_billing.${NC}"
+
+        echo -e "${GREEN}✓ Backup berhasil disimpan di: ${BACKUP_DIR}${NC}"
+        ls -lh "$BACKUP_DIR"/*"${timestamp}"*
+    else
+        echo -e "${RED}Perintah mysqldump tidak ditemukan.${NC}"
+    fi
+}
+
+# Fungsi: Bantuan / Help Menu
+cmd_help() {
+    print_header
+    echo -e "${BOLD}PENGGUNAAN:${NC}"
+    echo -e "  eai <perintah> [argumen]\n"
+    echo -e "${BOLD}DAFTAR PERINTAH:${NC}"
+    echo -e "  ${GREEN}status${NC}                  Melihat status layanan Nginx, PHP, MySQL & direktori"
+    echo -e "  ${GREEN}restart [target]${NC}        Merestart layanan. Target: all (default), nginx, php, mysql"
+    echo -e "  ${GREEN}reload${NC}                  Reload Nginx & PHP-FPM tanpa downtime"
+    echo -e "  ${GREEN}update${NC}                  Tarik git update, install composer, migrate, dan cache"
+    echo -e "  ${GREEN}migrate [target]${NC}        Menjalankan migrasi database. Target: all, simak, billing"
+    echo -e "  ${GREEN}seed [target]${NC}           Menjalankan database seeder. Target: all, simak, billing"
+    echo -e "  ${GREEN}cache:clear${NC}             Membersihkan seluruh cache aplikasi"
+    echo -e "  ${GREEN}cache:optimize${NC}          Mengoptimalkan cache konfigurasi, route & view untuk produksi"
+    echo -e "  ${GREEN}logs [target]${NC}           Memantau live log. Target: simak, billing, nginx"
+    echo -e "  ${GREEN}ssl:renew${NC}               Memperbarui sertifikat SSL Certbot Let's Encrypt"
+    echo -e "  ${GREEN}backup${NC}                  Membuat backup dump SQL db_simak dan db_billing"
+    echo -e "  ${GREEN}help${NC}                    Menampilkan panduan ini\n"
+    echo -e "${BOLD}CONTOH PENGGUNAAN:${NC}"
+    echo -e "  eai status"
+    echo -e "  eai update"
+    echo -e "  eai restart nginx"
+    echo -e "  eai logs simak"
+    echo -e "  eai backup\n"
+}
+
+# Router Perintah Utama
+case "${1:-help}" in
+    status)
+        cmd_status
+        ;;
+    restart)
+        cmd_restart "$2"
+        ;;
+    reload)
+        cmd_reload
+        ;;
+    update)
+        cmd_update
+        ;;
+    migrate)
+        cmd_migrate "$2"
+        ;;
+    seed)
+        cmd_seed "$2"
+        ;;
+    cache:clear|cache-clear)
+        cmd_cache_clear
+        ;;
+    cache:optimize|optimize)
+        cmd_cache_optimize
+        ;;
+    logs|log)
+        cmd_logs "$2"
+        ;;
+    ssl:renew|ssl-renew)
+        cmd_ssl_renew
+        ;;
+    backup)
+        cmd_backup
+        ;;
+    help|--help|-h)
+        cmd_help
+        ;;
+    *)
+        echo -e "${RED}Perintah tidak dikenal: $1${NC}"
+        cmd_help
+        exit 1
+        ;;
+esac

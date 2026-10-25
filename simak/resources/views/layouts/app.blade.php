@@ -518,19 +518,6 @@
 </head>
 <body>
     @auth
-    <!-- Ribbon Status Integrasi Enterprise -->
-    <div class="eai-status-ribbon">
-        <div class="eai-status-inner">
-            <div style="display: flex; align-items: center;">
-                <span class="eai-pulse-dot"></span>
-                <span>EAI Service Mesh: <strong>REST API & Webhook Active</strong> (Port 8000 &harr; 8001)</span>
-            </div>
-            <div>
-                <span>Target Host: <code>127.0.0.1:8001</code> (Total Billing System)</span>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Navigation Bar -->
     <header class="navbar">
         <div class="navbar-container">
@@ -602,8 +589,8 @@
 
     <footer class="site-footer">
         <div class="site-footer-inner">
-            <p>Arsitektur Enterprise Application Integration (EAI) &copy; 2026. Portal Akademik SIMAK.</p>
-            <p style="font-family: var(--font-mono); font-size: 11px;">Environment: Local Sandbox</p>
+            <p>&copy; 2026 SIMAK UNIVERSE. Sistem Informasi Akademik Terpadu.</p>
+            <p style="font-family: var(--font-mono); font-size: 11px;">SIMAK Portal</p>
         </div>
     </footer>
 

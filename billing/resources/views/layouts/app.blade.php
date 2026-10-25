@@ -359,19 +359,6 @@
     @yield('styles')
 </head>
 <body>
-    <!-- Live Core Pulse Bar -->
-    <div class="billing-topbar">
-        <div class="billing-topbar-inner">
-            <div style="display: flex; align-items: center;">
-                <span class="pulse-live"></span>
-                <span>Financial Engine: <strong>REST API & Webhook Service Active</strong> (Listening on Port 8001)</span>
-            </div>
-            <div>
-                <span>Database: <code>db_billing</code> (MySQL 3306)</span>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Navigation Bar -->
     <header class="navbar">
         <div class="navbar-inner">
@@ -380,20 +367,23 @@
                 <div class="brand-text-block">
                     <div class="brand-title">
                         TOTAL BILLING SYSTEM
-                        <span class="brand-tag">EAI Core</span>
                     </div>
-                    <div class="brand-subtitle">Financial Core & Payment Gateway Gateway Service</div>
+                    <div class="brand-subtitle">Financial Core & Payment Gateway Service</div>
                 </div>
             </a>
 
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span class="pill-badge success" style="padding: 6px 12px;">
-                    EAI API Provider Ready
-                </span>
-                <a href="http://localhost:8000" target="_blank" class="btn-fintech secondary sm">
-                    Buka Portal SIMAK (Port 8000) &rarr;
-                </a>
+            @auth
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="display: flex; flex-direction: column; text-align: right; line-height: 1.2;">
+                    <span style="font-size: 13px; font-weight: 700; color: var(--text-heading);">{{ Auth::user()->name }}</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">{{ Auth::user()->email }}</span>
+                </div>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-fintech secondary sm" style="font-size: 12px;">Keluar</button>
+                </form>
             </div>
+            @endauth
         </div>
     </header>
 
@@ -428,8 +418,8 @@
 
     <footer class="site-footer">
         <div class="site-footer-inner">
-            <p>Total Billing System &copy; 2026. Arsitektur Enterprise Application Integration (EAI).</p>
-            <p style="font-family: var(--font-mono); font-size: 11px;">EAI Provider Port: 8001</p>
+            <p>&copy; 2026 Total Billing System. Financial Core & Payment Gateway.</p>
+            <p style="font-family: var(--font-mono); font-size: 11px;">Billing Console</p>
         </div>
     </footer>
 
