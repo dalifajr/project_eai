@@ -1,3 +1,26 @@
+# Dokumentasi Markdown & Catatan Perencanaan
+*.md
+billing/*.md
+simak/*.md
 SPESIFIKASI_ARSITEKTUR_DAN_RENCANA_PENGEMBANGAN_EAI.md
 rencana pengembangan.md
+PANDUAN_SETUP_SERVER_UBUNTU.md
+
+# File Catatan Teks
+*.txt
 perbaikan.txt
+
+# Diagram Arsitektur & Rancangan Desain
+/*.png
+/*.jpg
+/*.jpeg
+/*.pdf
+Diagram Use Case Integrasi SIMAK dan Billing.png
+ERD.png
+activity diagram input krs.png
+activity diagram pendaftaran wisuda.png
+
+# Environment & Credentials Local
+.env
+.env.backup
+.env.production
