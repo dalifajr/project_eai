@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Bukti Pendaftaran Wisuda - {{ $mahasiswa->nim }} - {{ $mahasiswa->nama }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
             font-size: 13px;
             color: #111;
             padding: 30px;
@@ -21,6 +24,7 @@
             font-size: 18px;
             margin-bottom: 4px;
             text-transform: uppercase;
+            font-weight: 700;
         }
         .header p {
             font-size: 12px;
@@ -37,7 +41,7 @@
         }
         .card-box {
             border: 1px solid #333;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 16px;
             margin-bottom: 20px;
             background: #fafafa;
@@ -67,7 +71,7 @@
 </head>
 <body>
     <div class="no-print" style="margin-bottom: 20px; text-align: right;">
-        <button onclick="window.print()" style="padding: 8px 18px; font-size: 13px; font-weight: bold; cursor: pointer; background: #1e3a8a; color: #fff; border: none; border-radius: 4px;">
+        <button onclick="window.print()" style="padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; background: #65558f; color: #fff; border: none; border-radius: 9999px; font-family: 'Google Sans', sans-serif;">
             Cetak Bukti Pendaftaran Wisuda
         </button>
     </div>
@@ -80,21 +84,21 @@
     </div>
 
     <div class="card-box">
-        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 6px;">
+        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 6px; font-weight: 700;">
             DATA CALON WISUDAWAN
         </h3>
         <table class="meta-table" style="margin-bottom: 0;">
             <tr>
                 <td style="width: 25%;"><strong>Nomor Pendaftaran</strong></td>
-                <td style="width: 75%;">: WSD-2026-{{ str_pad($pendaftaran->id, 4, '0', STR_PAD_LEFT) }}</td>
+                <td style="width: 75%;">: <span style="font-family: 'Google Sans Mono', monospace;">WSD-2026-{{ str_pad($pendaftaran->id, 4, '0', STR_PAD_LEFT) }}</span></td>
             </tr>
             <tr>
                 <td><strong>NIM</strong></td>
-                <td>: {{ $mahasiswa->nim }}</td>
+                <td>: <span style="font-family: 'Google Sans Mono', monospace;">{{ $mahasiswa->nim }}</span></td>
             </tr>
             <tr>
                 <td><strong>Nama Lengkap</strong></td>
-                <td>: {{ $mahasiswa->nama }}</td>
+                <td>: <strong>{{ $mahasiswa->nama }}</strong></td>
             </tr>
             <tr>
                 <td><strong>Program Studi / Fakultas</strong></td>
@@ -102,63 +106,68 @@
             </tr>
             <tr>
                 <td><strong>Status Kelulusan Skripsi</strong></td>
-                <td>: LULUS SIDANG TUGAS AKHIR</td>
-            </tr>
-            <tr>
-                <td><strong>Verifikasi Bebas Lab / Pustaka</strong></td>
-                <td>: TERVERIFIKASI LENGKAP</td>
+                <td>: LULUS YUDISIUM</td>
             </tr>
         </table>
     </div>
 
     <div class="card-box">
-        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 6px;">
-            STATUS TRANSAKSI & PERLENGKAPAN TOGA (EAI VERIFIED)
+        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 6px; font-weight: 700;">
+            STATUS INTEGRASI EAI TOTAL BILLING SYSTEM
         </h3>
         <table class="meta-table" style="margin-bottom: 0;">
             <tr>
-                <td style="width: 25%;"><strong>Invoice Paket Wisuda</strong></td>
-                <td style="width: 75%;">: {{ $pendaftaran->invoice_wisuda_id }} (Rp {{ number_format($pendaftaran->nominal_wisuda, 0, ',', '.') }})</td>
-            </tr>
-            <tr>
-                <td><strong>Nomor Virtual Account</strong></td>
-                <td>: {{ $pendaftaran->nomor_va }}</td>
+                <td style="width: 25%;"><strong>Nomor Virtual Account</strong></td>
+                <td style="width: 75%;">: <strong style="font-family: 'Google Sans Mono', monospace;">{{ $pendaftaran->nomor_va }}</strong></td>
             </tr>
             <tr>
                 <td><strong>Status Pembayaran</strong></td>
-                <td>: <strong style="color: green;">LUNAS (PAID)</strong></td>
+                <td>: <strong style="color: #146c2e;">LUNAS (TERVERIFIKASI REALTIME WEBHOOK)</strong></td>
             </tr>
             <tr>
-                <td><strong>Ukuran Jubah Toga</strong></td>
-                <td>: <strong>{{ $pendaftaran->ukuran_toga ?? 'Belum ditentukan' }}</strong></td>
+                <td><strong>Nominal Pembayaran</strong></td>
+                <td>: Rp {{ number_format($pendaftaran->nominal_wisuda, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td><strong>Alokasi Undangan Pendamping</strong></td>
-                <td>: {{ $pendaftaran->jumlah_undangan }} Kursi VIP</td>
+                <td><strong>Waktu Verifikasi Lunas</strong></td>
+                <td>: {{ $pendaftaran->updated_at }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card-box">
+        <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 6px; font-weight: 700;">
+            RINCIAN PERLENGKAPAN & ALOKASI UNDANGAN
+        </h3>
+        <table class="meta-table" style="margin-bottom: 0;">
+            <tr>
+                <td style="width: 25%;"><strong>Ukuran Baju Jubah Toga</strong></td>
+                <td style="width: 75%;">: <strong>Ukuran {{ $pendaftaran->ukuran_toga }}</strong></td>
             </tr>
             <tr>
-                <td><strong>Catatan Pendaftaran</strong></td>
+                <td><strong>Alokasi Kursi Undangan</strong></td>
+                <td>: {{ $pendaftaran->jumlah_undangan }} Orang (2 VIP + {{ max(0, $pendaftaran->jumlah_undangan - 2) }} Reguler)</td>
+            </tr>
+            <tr>
+                <td><strong>Catatan Fasilitas Khusus</strong></td>
                 <td>: {{ $pendaftaran->catatan ?? '-' }}</td>
             </tr>
         </table>
     </div>
 
-    <p style="font-size: 12px; color: #555; margin-top: 15px;">
-        * Harap membawa lembar bukti pendaftaran ini pada saat pengambilan toga dan gladi resik wisuda di Gedung Rektorat.
-    </p>
-
     <div class="signatures">
         <div class="sig-block">
-            <p>Panitia Pelaksana Wisuda,</p>
-            <p>Biro Administrasi Akademik (BAA)</p>
+            <p>Calon Wisudawan,</p>
             <div class="sig-line"></div>
-            <p>Dr. Ir. Hendra Gunawan, M.Kom.<br>NIP. 19750812 200003 1 001</p>
+            <p style="margin-top: 6px;"><strong>{{ $mahasiswa->nama }}</strong></p>
+            <p style="font-size: 11px;">NIM. {{ $mahasiswa->nim }}</p>
         </div>
+
         <div class="sig-block">
-            <p>Kota Kampus, {{ date('d F Y') }}</p>
-            <p>Calon Wisudawan</p>
+            <p>Panitia Wisuda Universitas,</p>
             <div class="sig-line"></div>
-            <p><strong>{{ $mahasiswa->nama }}</strong><br>NIM. {{ $mahasiswa->nim }}</p>
+            <p style="margin-top: 6px;"><strong>Biro Administrasi Akademik</strong></p>
+            <p style="font-size: 11px;">SIMAK EAI System Verified</p>
         </div>
     </div>
 </body>

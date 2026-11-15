@@ -1,0 +1,737 @@
+/*
+ * Total Billing System — Flat Material You (Android 17 / M3 Expressive & BeerCSS Architecture)
+ * Fintech Palette: Mint, Emerald & Teal Expressive
+ * Typography: Google Sans (Display, Sans, Mono)
+ * Hierarchy: Multi-layer Tonal Surfaces, Concentric Radii (28px / 20px / 16px / 12px / 8px / Pill), Zero Heavy Shadow.
+ */
+
+/* === GOOGLE SANS FONT FAMILY DECLARATIONS === */
+@font-face {
+    font-family: 'Google Sans';
+    src: local('Google Sans Regular'), local('Google Sans'), local('Product Sans'),
+         url('https://fonts.gstatic.com/s/googlesans/v58/4Ua_rENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iqcsih3SAyH6cAwhX9RFD48TE63OOYKtrwEIJllpyw.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Google Sans';
+    src: local('Google Sans Medium'), local('Google Sans-Medium'), local('Product Sans Medium'),
+         url('https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLU94YtzCwY.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Google Sans';
+    src: local('Google Sans SemiBold'), local('Google Sans Medium'), local('Product Sans Bold'),
+         url('https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLU94YtzCwY.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Google Sans';
+    src: local('Google Sans Bold'), local('Google Sans-Bold'), local('Product Sans Bold'),
+         url('https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLV154tzCwY.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Google Sans Display';
+    src: local('Google Sans Display Regular'), local('Google Sans Display'), local('Google Sans'),
+         url('https://fonts.gstatic.com/s/googlesans/v58/4Ua_rENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iqcsih3SAyH6cAwhX9RFD48TE63OOYKtrwEIJllpyw.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Google Sans Display';
+    src: local('Google Sans Display Medium'), local('Google Sans Medium'),
+         url('https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLU94YtzCwY.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Google Sans Display';
+    src: local('Google Sans Display Bold'), local('Google Sans Bold'),
+         url('https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLV154tzCwY.woff2') format('woff2');
+    font-weight: 600 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Google Sans Mono';
+    src: local('Google Sans Mono'), local('JetBrains Mono'), local('Roboto Mono'), monospace;
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* === DESIGN TOKENS (LIGHT & DARK MODE) === */
+:root,
+[data-theme="light"],
+[data-bs-theme="light"] {
+    /* Typography Tokens */
+    --font-sans: 'Google Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-display: 'Google Sans Display', 'Google Sans', sans-serif;
+    --font-mono: 'Google Sans Mono', 'JetBrains Mono', Consolas, monospace;
+
+    /* Concentric Corner Radii (Android 17 / BeerCSS) */
+    --radius-xs: 8px;       /* Badges, tags */
+    --radius-sm: 12px;      /* Inputs, sub-cards */
+    --radius-md: 16px;      /* Standard Cards, Data tables */
+    --radius-lg: 20px;      /* Primary Feature Cards, Simulator Console */
+    --radius-xl: 28px;      /* Hero greeting, Floating modals */
+    --radius-pill: 9999px;  /* Full Pill buttons, active nav indicators */
+
+    /* M3 Fintech Emerald & Teal Palette */
+    --primary: #006a60;
+    --on-primary: #ffffff;
+    --primary-container: #70f7e5;
+    --on-primary-container: #00201c;
+
+    --secondary: #4a635f;
+    --on-secondary: #ffffff;
+    --secondary-container: #cce8e2;
+    --on-secondary-container: #05201c;
+
+    --tertiary: #456179;
+    --on-tertiary: #ffffff;
+    --tertiary-container: #cde5ff;
+    --on-tertiary-container: #001e31;
+
+    --error: #ba1a1a;
+    --on-error: #ffffff;
+    --error-container: #ffdad6;
+    --on-error-container: #410002;
+
+    --warning: #b45309;
+    --on-warning: #ffffff;
+    --warning-container: #ffdf9e;
+    --on-warning-container: #2e1600;
+
+    --success: #146c2e;
+    --on-success: #ffffff;
+    --success-container: #c4eed0;
+    --on-success-container: #072711;
+
+    /* Tonal Surfaces (Flat Material You Fintech - Zero Heavy Drop Shadow) */
+    --background: #f4fbf8;
+    --on-background: #161d1b;
+    --surface: #f4fbf8;
+    --surface-dim: #d5dbd8;
+    --surface-bright: #f4fbf8;
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #edf5f2;
+    --surface-container: #e7efec;
+    --surface-container-high: #e1e9e6;
+    --surface-container-highest: #dbe4e1;
+    --on-surface: #161d1b;
+    --surface-variant: #dae5e1;
+    --on-surface-variant: #3f4946;
+
+    /* Outlines & Lines */
+    --outline: #6f7976;
+    --outline-variant: #bec9c5;
+    --shadow: none;
+    --overlay: rgba(0, 0, 0, 0.38);
+    --active: rgba(0, 106, 96, 0.12);
+
+    /* M3 Motion Curves */
+    --motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+    --motion-easing-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+    --motion-easing-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+    --motion-duration-enter: 300ms;
+    --motion-duration-exit: 200ms;
+
+    /* Legacy CSS Variable Bridge for existing views */
+    --bg-base: var(--background);
+    --bg-surface: var(--surface-container-lowest);
+    --bg-subtle: var(--surface-container-low);
+    --border-subtle: var(--outline-variant);
+    --border-strong: var(--outline);
+    --brand-fintech: var(--primary);
+    --brand-fintech-hover: #005048;
+    --brand-fintech-surface: var(--primary-container);
+    --brand-fintech-border: var(--outline-variant);
+    --brand-accent: #00877a;
+    --text-heading: var(--on-surface);
+    --text-body: var(--on-surface-variant);
+    --text-muted: #6f7976;
+    --status-success-bg: var(--success-container);
+    --status-success-border: #a7f3d0;
+    --status-success-text: var(--on-success-container);
+    --status-danger-bg: var(--error-container);
+    --status-danger-border: #ffdad6;
+    --status-danger-text: var(--on-error-container);
+    --status-warning-bg: var(--warning-container);
+    --status-warning-border: #fde68a;
+    --status-warning-text: var(--on-warning-container);
+}
+
+[data-theme="dark"],
+[data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    /* M3 Fintech Dark Palette */
+    --primary: #51dbcb;
+    --on-primary: #003731;
+    --primary-container: #005048;
+    --on-primary-container: #70f7e5;
+
+    --secondary: #b1ccc6;
+    --on-secondary: #1c3531;
+    --secondary-container: #334b47;
+    --on-secondary-container: #cce8e2;
+
+    --tertiary: #a9cbe4;
+    --on-tertiary: #103348;
+    --tertiary-container: #2b495f;
+    --on-tertiary-container: #cde5ff;
+
+    --error: #f2b8b5;
+    --on-error: #601410;
+    --error-container: #8c1d18;
+    --on-error-container: #f9dedc;
+
+    --warning: #fdd663;
+    --on-warning: #3a2800;
+    --warning-container: #573e00;
+    --on-warning-container: #ffdf9e;
+
+    --success: #6dd58c;
+    --on-success: #0a3818;
+    --success-container: #0f5223;
+    --on-success-container: #c4eed0;
+
+    /* Tonal Surfaces Dark */
+    --background: #0e1513;
+    --on-background: #deE4E1;
+    --surface: #0e1513;
+    --surface-dim: #0e1513;
+    --surface-bright: #343a39;
+    --surface-container-lowest: #090f0e;
+    --surface-container-low: #171d1c;
+    --surface-container: #1b2120;
+    --surface-container-high: #252b2a;
+    --surface-container-highest: #303635;
+    --on-surface: #deE4E1;
+    --surface-variant: #3f4946;
+    --on-surface-variant: #bec9c5;
+
+    --outline: #899390;
+    --outline-variant: #3f4946;
+    --active: rgba(81, 219, 203, 0.14);
+
+    /* Legacy Bridge Dark */
+    --bg-base: var(--background);
+    --bg-surface: var(--surface-container-low);
+    --bg-subtle: var(--surface-container);
+    --border-subtle: var(--outline-variant);
+    --border-strong: var(--outline);
+    --brand-fintech: var(--primary);
+    --brand-fintech-hover: #70f7e5;
+    --brand-fintech-surface: var(--primary-container);
+    --brand-fintech-border: var(--outline-variant);
+    --brand-accent: #51dbcb;
+    --text-heading: var(--on-surface);
+    --text-body: var(--on-surface-variant);
+    --text-muted: #899390;
+    --status-success-bg: var(--success-container);
+    --status-success-border: #0f5223;
+    --status-success-text: var(--on-success-container);
+    --status-danger-bg: var(--error-container);
+    --status-danger-border: #8c1d18;
+    --status-danger-text: var(--on-error-container);
+    --status-warning-bg: var(--warning-container);
+    --status-warning-border: #573e00;
+    --status-warning-text: var(--on-warning-container);
+}
+
+/* === BASE RESET & GLOBAL STYLING === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.25s var(--motion-easing-emphasized),
+                border-color 0.25s var(--motion-easing-emphasized),
+                color 0.25s var(--motion-easing-emphasized);
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--on-surface-variant);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    color: var(--on-surface);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+code, kbd, samp, pre {
+    font-family: var(--font-mono);
+}
+
+/* === TOP STATUS BAR & NAVBAR === */
+.billing-topbar {
+    background: var(--surface-container-high);
+    color: var(--on-surface-variant);
+    font-size: 11.5px;
+    padding: 8px 24px;
+    border-bottom: 1px solid var(--outline-variant);
+}
+
+.billing-topbar-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pulse-live {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    box-shadow: 0 0 8px #10b981;
+    animation: m3Pulse 2s infinite;
+}
+
+@keyframes m3Pulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.navbar {
+    background-color: var(--surface-container-lowest);
+    border-bottom: 1px solid var(--outline-variant);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: none;
+}
+
+.navbar-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--on-surface);
+}
+
+.brand-badge {
+    width: 38px;
+    height: 38px;
+    background: var(--primary);
+    color: var(--on-primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    font-family: var(--font-display);
+    box-shadow: none;
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--on-surface);
+}
+
+.brand-tag {
+    font-size: 11px;
+    color: var(--on-surface-variant);
+    font-weight: 500;
+}
+
+/* Theme Toggle Button (Light/Dark Mode) */
+.m3-theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-container);
+    border: 1px solid var(--outline-variant);
+    color: var(--on-surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+.m3-theme-toggle:hover {
+    background: var(--surface-container-high);
+    transform: scale(1.05);
+}
+
+.m3-theme-toggle:active {
+    transform: scale(0.95);
+}
+
+/* === M3 FINTECH CARDS (ZERO SHADOW) === */
+.card-fintech,
+.m3-card {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: none;
+    position: relative;
+}
+
+.card-header-fintech,
+.m3-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--outline-variant);
+}
+
+.card-title-fintech {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--on-surface);
+}
+
+.card-subtitle-fintech {
+    font-size: 12.5px;
+    color: var(--on-surface-variant);
+    margin-top: 3px;
+}
+
+/* === M3 EXPRESSIVE BUTTONS === */
+.btn-fintech,
+.m3-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 22px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    border-radius: var(--radius-pill);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s var(--motion-easing-emphasized);
+    line-height: 1;
+}
+
+.btn-fintech:active,
+.m3-btn:active {
+    transform: scale(0.98);
+}
+
+.btn-fintech.primary,
+.m3-btn-filled {
+    background: var(--primary);
+    color: var(--on-primary);
+}
+
+.btn-fintech.primary:hover,
+.m3-btn-filled:hover {
+    background: var(--brand-fintech-hover);
+    color: var(--on-primary);
+}
+
+.btn-fintech.secondary,
+.m3-btn-tonal {
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
+}
+
+.btn-fintech.secondary:hover,
+.m3-btn-tonal:hover {
+    background: var(--surface-container-high);
+}
+
+.btn-fintech.outlined,
+.m3-btn-outlined {
+    background: transparent;
+    border: 1px solid var(--outline);
+    color: var(--primary);
+}
+
+.btn-fintech.sm {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: var(--radius-pill);
+}
+
+/* === M3 STATUS PILL BADGES === */
+.pill-badge,
+.m3-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 11.5px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+    border: 1px solid transparent;
+}
+
+.pill-badge.success,
+.m3-badge-pill.success {
+    background: var(--success-container);
+    color: var(--on-success-container);
+}
+
+.pill-badge.danger,
+.m3-badge-pill.danger {
+    background: var(--error-container);
+    color: var(--on-error-container);
+}
+
+.pill-badge.warning,
+.m3-badge-pill.warning {
+    background: var(--warning-container);
+    color: var(--on-warning-container);
+}
+
+.pill-badge.neutral,
+.m3-badge-pill.neutral {
+    background: var(--surface-container);
+    color: var(--on-surface-variant);
+    border-color: var(--outline-variant);
+}
+
+/* === M3 DATA TABLES === */
+.table-container-fintech,
+.m3-table-container {
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.table-fintech,
+.m3-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    text-align: left;
+}
+
+.table-fintech th,
+.m3-table th {
+    background: var(--surface-container-low);
+    color: var(--on-surface-variant);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--outline-variant);
+}
+
+.table-fintech td,
+.m3-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--outline-variant);
+    color: var(--on-surface);
+    vertical-align: middle;
+}
+
+.table-fintech tr:last-child td,
+.m3-table tr:last-child td {
+    border-bottom: none;
+}
+
+.table-fintech tbody tr:hover,
+.m3-table tbody tr:hover {
+    background: var(--surface-container);
+}
+
+/* === M3 INPUT & FORM FIELDS === */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: var(--font-sans);
+    background: var(--surface-container-lowest);
+    color: var(--on-surface);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-container);
+}
+
+/* === FLOATING M3 TOAST NOTIFICATIONS === */
+.m3-toast-container {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.m3-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 320px;
+    max-width: 480px;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    background: var(--surface-container-high);
+    color: var(--on-surface);
+    border: 1px solid var(--outline-variant);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    animation: m3ToastEnter var(--motion-duration-enter) var(--motion-easing-decelerate);
+}
+
+@keyframes m3ToastEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.m3-toast-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.m3-toast.success .m3-toast-icon {
+    background: var(--success-container);
+    color: var(--on-success-container);
+}
+
+.m3-toast.error .m3-toast-icon {
+    background: var(--error-container);
+    color: var(--on-error-container);
+}
+
+.m3-toast.warning .m3-toast-icon {
+    background: var(--warning-container);
+    color: var(--on-warning-container);
+}
+
+.m3-toast-content {
+    flex: 1;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.m3-toast-close {
+    background: transparent;
+    border: none;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    line-height: 1;
+    border-radius: 50%;
+}
+
+.m3-toast-close:hover {
+    background: var(--active);
+    color: var(--on-surface);
+}
+
+/* === FOOTER === */
+.footer-fintech {
+    margin-top: auto;
+    border-top: 1px solid var(--outline-variant);
+    background: var(--surface-container-lowest);
+    padding: 24px 0;
+    color: var(--on-surface-variant);
+    font-size: 12.5px;
+}
+
+.footer-fintech-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* === RESPONSIVE UTILITIES === */
+@media (max-width: 768px) {
+    .navbar-inner,
+    .billing-topbar-inner {
+        padding: 0 16px;
+    }
+    .card-fintech {
+        padding: 16px;
+        border-radius: var(--radius-md);
+    }
+    .table-container-fintech {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .footer-fintech-inner {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+}

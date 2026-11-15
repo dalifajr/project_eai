@@ -17,9 +17,22 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Konfigurasi Path Default (Dapat disesuaikan jika path berbeda)
+[ -f /etc/eai/config ] && . /etc/eai/config
+[ -f /etc/eai.conf ] && . /etc/eai.conf
+
 SIMAK_PATH="${SIMAK_PATH:-/var/www/simak}"
 BILLING_PATH="${BILLING_PATH:-/var/www/billing}"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/eai}"
+
+# Auto-deteksi direktori clone Git repositori jika REPO_DIR belum disetel
+if [ -z "$REPO_DIR" ]; then
+    for candidate in "$HOME/PROJECT EAI" "$HOME/eai" "$HOME/eai_project" "/root/PROJECT EAI" "/root/eai" "/root/eai_project" "/var/www/eai" "$(dirname "$(dirname "$(readlink -f "$0" 2>/dev/null || echo "")")")"; do
+        if [ -d "$candidate/.git" ] && [ -d "$candidate/simak" ] && [ -d "$candidate/billing" ]; then
+            REPO_DIR="$candidate"
+            break
+        fi
+    done
+fi
 
 # Deteksi Versi PHP-FPM Aktif
 PHP_SERVICE=$(systemctl list-units --type=service --state=running | grep -oE "php[0-9.]+-fpm" | head -n 1)
@@ -134,50 +147,88 @@ cmd_update() {
     print_header
     echo -e "${BOLD}${YELLOW}=== MEMULAI PEMBARUAN APLIKASI (SIMAK & BILLING) ===${NC}\n"
 
-    # Update SIMAK
+    # 1. Update dari Repositori Git Utama jika ada
+    if [ -n "$REPO_DIR" ] && [ -d "$REPO_DIR/.git" ]; then
+        echo -e "${CYAN}--> Menarik pembaruan dari Git Repositori (${REPO_DIR})...${NC}"
+        cd "$REPO_DIR"
+        git pull || echo -e "${YELLOW}Catatan: Git pull repositori utama dilewati / tidak ada remote.${NC}"
+
+        echo -e "${CYAN}--> Menyinkronkan file proyek ke direktori server...${NC}"
+        if command -v rsync &> /dev/null; then
+            rsync -av --exclude='.env' --exclude='storage/' --exclude='vendor/' "$REPO_DIR/simak/" "$SIMAK_PATH/"
+            rsync -av --exclude='.env' --exclude='storage/' --exclude='vendor/' "$REPO_DIR/billing/" "$BILLING_PATH/"
+        else
+            cp -r "$REPO_DIR/simak/resources" "$SIMAK_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/public" "$SIMAK_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/app" "$SIMAK_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/routes" "$SIMAK_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/database" "$SIMAK_PATH/" 2>/dev/null || true
+
+            cp -r "$REPO_DIR/billing/resources" "$BILLING_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/public" "$BILLING_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/app" "$BILLING_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/routes" "$BILLING_PATH/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/database" "$BILLING_PATH/" 2>/dev/null || true
+        fi
+
+        if [ -f "$REPO_DIR/bin/eai" ]; then
+            cp "$REPO_DIR/bin/eai" /usr/local/bin/eai 2>/dev/null || true
+            chmod +x /usr/local/bin/eai 2>/dev/null || true
+        fi
+        echo -e "${GREEN}✓ Sinkronisasi berkas terbaru selesai.${NC}\n"
+    fi
+
+    # 2. Update SIMAK
     if [ -d "$SIMAK_PATH" ]; then
-        echo -e "${CYAN}--> Memperbarui SIMAK Portal (${SIMAK_PATH})...${NC}"
+        echo -e "${CYAN}--> Memproses dependensi & cache SIMAK Portal (${SIMAK_PATH})...${NC}"
         cd "$SIMAK_PATH"
         if [ -d ".git" ]; then
-            echo "Menarik update git terbaru..."
-            git pull || echo -e "${YELLOW}Catatan: Git pull dilewati.${NC}"
+            echo "Menarik update git langsung di folder simak..."
+            git pull || echo -e "${YELLOW}Catatan: Git pull lokal dilewati.${NC}"
         fi
-        echo "Menginstal dependensi Composer..."
-        composer install --no-dev --optimize-autoloader --no-interaction
+        if command -v composer &> /dev/null; then
+            echo "Menginstal dependensi Composer..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+        fi
         echo "Menjalankan migrasi database..."
         php artisan migrate --force
-        echo "Mengoptimalkan cache konfigurasi dan view..."
+        echo "Membersihkan dan mengoptimalkan cache produksi..."
+        php artisan optimize:clear
         php artisan config:cache
         php artisan route:cache
         php artisan view:cache
-        chown -R www-data:www-data "$SIMAK_PATH/storage" "$SIMAK_PATH/bootstrap/cache"
-        chmod -R 775 "$SIMAK_PATH/storage" "$SIMAK_PATH/bootstrap/cache"
+        chown -R www-data:www-data "$SIMAK_PATH/storage" "$SIMAK_PATH/bootstrap/cache" 2>/dev/null || true
+        chmod -R 775 "$SIMAK_PATH/storage" "$SIMAK_PATH/bootstrap/cache" 2>/dev/null || true
         echo -e "${GREEN}✓ SIMAK Portal berhasil diperbarui.${NC}\n"
     fi
 
-    # Update Billing
+    # 3. Update Billing
     if [ -d "$BILLING_PATH" ]; then
-        echo -e "${CYAN}--> Memperbarui Total Billing System (${BILLING_PATH})...${NC}"
+        echo -e "${CYAN}--> Memproses dependensi & cache Total Billing System (${BILLING_PATH})...${NC}"
         cd "$BILLING_PATH"
         if [ -d ".git" ]; then
-            echo "Menarik update git terbaru..."
-            git pull || echo -e "${YELLOW}Catatan: Git pull dilewati.${NC}"
+            echo "Menarik update git langsung di folder billing..."
+            git pull || echo -e "${YELLOW}Catatan: Git pull lokal dilewati.${NC}"
         fi
-        echo "Menginstal dependensi Composer..."
-        composer install --no-dev --optimize-autoloader --no-interaction
+        if command -v composer &> /dev/null; then
+            echo "Menginstal dependensi Composer..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+        fi
         echo "Menjalankan migrasi database..."
         php artisan migrate --force
-        echo "Mengoptimalkan cache konfigurasi dan view..."
+        echo "Membersihkan dan mengoptimalkan cache produksi..."
+        php artisan optimize:clear
         php artisan config:cache
         php artisan route:cache
         php artisan view:cache
-        chown -R www-data:www-data "$BILLING_PATH/storage" "$BILLING_PATH/bootstrap/cache"
-        chmod -R 775 "$BILLING_PATH/storage" "$BILLING_PATH/bootstrap/cache"
+        chown -R www-data:www-data "$BILLING_PATH/storage" "$BILLING_PATH/bootstrap/cache" 2>/dev/null || true
+        chmod -R 775 "$BILLING_PATH/storage" "$BILLING_PATH/bootstrap/cache" 2>/dev/null || true
         echo -e "${GREEN}✓ Total Billing System berhasil diperbarui.${NC}\n"
     fi
 
-    # Reload services
-    systemctl reload "$PHP_SERVICE" || true
+    # 4. Reload services
+    systemctl reload "$PHP_SERVICE" 2>/dev/null || true
+    systemctl reload nginx 2>/dev/null || true
     echo -e "${GREEN}${BOLD}✓ Seluruh pembaruan aplikasi dan dependensi telah tuntas.${NC}"
 }
 

@@ -1,524 +1,33 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Portal Akademik') | SIMAK UNIVERSE</title>
-    <!-- Google Fonts: Plus Jakarta Sans -->
+    
+    <!-- Instant Anti-FOUC Theme Initializer -->
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('simak-theme') || 
+                                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.documentElement.setAttribute('data-bs-theme', savedTheme);
+                document.documentElement.style.colorScheme = savedTheme;
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Google Fonts Preconnect & M3 Material You Core CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-base: #f8fafc;
-            --bg-surface: #ffffff;
-            --bg-surface-elevated: #ffffff;
-            --bg-subtle: #f1f5f9;
-            --border-subtle: #e2e8f0;
-            --border-strong: #cbd5e1;
-            
-            --brand-primary: #1e40af;
-            --brand-primary-hover: #1d4ed8;
-            --brand-surface: #eff6ff;
-            --brand-text: #1e3a8a;
-
-            --text-heading: #0f172a;
-            --text-body: #334155;
-            --text-muted: #64748b;
-            --text-on-brand: #ffffff;
-
-            --status-success-bg: #ecfdf5;
-            --status-success-border: #a7f3d0;
-            --status-success-text: #065f46;
-            
-            --status-warning-bg: #fffbeb;
-            --status-warning-border: #fde68a;
-            --status-warning-text: #92400e;
-
-            --status-danger-bg: #fef2f2;
-            --status-danger-border: #fecaca;
-            --status-danger-text: #991b1b;
-
-            --status-info-bg: #f0f9ff;
-            --status-info-border: #bae6fd;
-            --status-info-text: #075985;
-
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --radius-xl: 18px;
-            --radius-pill: 9999px;
-
-            --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-            --shadow-sm: 0 2px 4px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-            --shadow-md: 0 4px 8px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-
-            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--bg-base);
-            color: var(--text-body);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Top Bar */
-        .navbar {
-            background-color: var(--bg-surface);
-            border-bottom: 1px solid var(--border-subtle);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar-container {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 0 24px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--text-heading);
-        }
-
-        .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 15px;
-            box-shadow: 0 2px 6px rgba(30, 58, 138, 0.25);
-        }
-
-        .brand-meta {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand-title {
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            color: var(--text-heading);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .brand-badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            border-radius: var(--radius-sm);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .brand-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--bg-subtle);
-            padding: 4px;
-            border-radius: var(--radius-pill);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .nav-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: var(--radius-pill);
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-item:hover {
-            color: var(--brand-primary);
-            background-color: var(--bg-surface);
-        }
-
-        .nav-item.active {
-            background-color: var(--bg-surface);
-            color: var(--brand-primary);
-            box-shadow: var(--shadow-xs);
-        }
-
-        .user-nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .user-profile-chip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 4px 10px 4px 6px;
-            border-radius: var(--radius-pill);
-            background: var(--bg-subtle);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .avatar-circle {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--brand-primary);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .user-meta-text {
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-            line-height: 1.2;
-        }
-
-        .user-display-name {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-heading);
-        }
-
-        .user-role-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            text-transform: capitalize;
-        }
-
-        .btn-logout-minimal {
-            background: transparent;
-            border: 1px solid var(--border-subtle);
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .btn-logout-minimal:hover {
-            color: var(--status-danger-text);
-            border-color: var(--status-danger-border);
-            background-color: var(--status-danger-bg);
-        }
-
-        /* EAI Live Connection Indicator Ribbon */
-        .eai-status-ribbon {
-            background: #0f172a;
-            color: #94a3b8;
-            font-size: 11px;
-            padding: 6px 24px;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        .eai-status-inner {
-            max-width: 1240px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .eai-pulse-dot {
-            width: 7px;
-            height: 7px;
-            background-color: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-            box-shadow: 0 0 6px #10b981;
-        }
-
-        /* Main Canvas Layout */
-        .page-content {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 28px 24px 60px;
-            width: 100%;
-            flex: 1;
-        }
-
-        /* Modern Card System */
-        .card-modern {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 22px 24px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 22px;
-            transition: border-color 0.15s ease;
-        }
-
-        .card-header-modern {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-            padding-bottom: 16px;
-            margin-bottom: 18px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .card-title-modern {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-heading);
-            letter-spacing: -0.01em;
-        }
-
-        .card-subtitle-modern {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        /* Alerts & Callouts */
-        .banner-alert {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            margin-bottom: 20px;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .banner-alert.success {
-            background-color: var(--status-success-bg);
-            border: 1px solid var(--status-success-border);
-            color: var(--status-success-text);
-        }
-
-        .banner-alert.warning {
-            background-color: var(--status-warning-bg);
-            border: 1px solid var(--status-warning-border);
-            color: var(--status-warning-text);
-        }
-
-        .banner-alert.danger {
-            background-color: var(--status-danger-bg);
-            border: 1px solid var(--status-danger-border);
-            color: var(--status-danger-text);
-        }
-
-        /* Modern Badges */
-        .badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: var(--radius-pill);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            line-height: 1.3;
-        }
-
-        .badge-pill.success {
-            background-color: var(--status-success-bg);
-            color: var(--status-success-text);
-            border: 1px solid var(--status-success-border);
-        }
-
-        .badge-pill.danger {
-            background-color: var(--status-danger-bg);
-            color: var(--status-danger-text);
-            border: 1px solid var(--status-danger-border);
-        }
-
-        .badge-pill.warning {
-            background-color: var(--status-warning-bg);
-            color: var(--status-warning-text);
-            border: 1px solid var(--status-warning-border);
-        }
-
-        .badge-pill.neutral {
-            background-color: var(--bg-subtle);
-            color: var(--text-muted);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .badge-pill.brand {
-            background-color: var(--brand-surface);
-            color: var(--brand-primary);
-            border: 1px solid #bfdbfe;
-        }
-
-        /* Buttons */
-        .btn-modern {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 8px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            border: 1px solid transparent;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 40px;
-        }
-
-        .btn-modern.primary {
-            background-color: var(--brand-primary);
-            color: #ffffff;
-            box-shadow: 0 1px 2px rgba(30, 64, 175, 0.2);
-        }
-
-        .btn-modern.primary:hover {
-            background-color: var(--brand-primary-hover);
-        }
-
-        .btn-modern.secondary {
-            background-color: var(--bg-surface);
-            border-color: var(--border-subtle);
-            color: var(--text-heading);
-        }
-
-        .btn-modern.secondary:hover {
-            background-color: var(--bg-subtle);
-            border-color: var(--border-strong);
-        }
-
-        .btn-modern.danger {
-            background-color: #dc2626;
-            color: #ffffff;
-        }
-
-        .btn-modern.danger:hover {
-            background-color: #b91c1c;
-        }
-
-        .btn-modern.sm {
-            min-height: 32px;
-            padding: 4px 12px;
-            font-size: 12px;
-        }
-
-        /* Tables */
-        .table-container-modern {
-            overflow-x: auto;
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            background: var(--bg-surface);
-        }
-
-        .table-modern {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: left;
-            font-feature-settings: "tnum";
-        }
-
-        .table-modern th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .table-modern td {
-            padding: 13px 16px;
-            border-bottom: 1px solid var(--border-subtle);
-            color: var(--text-body);
-        }
-
-        .table-modern tr:last-child td {
-            border-bottom: none;
-        }
-
-        .table-modern tr:hover td {
-            background-color: #fbfcfe;
-        }
-
-        /* Code snippets */
-        code {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            background: var(--bg-subtle);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-heading);
-        }
-
-        /* Footer */
-        .site-footer {
-            background-color: var(--bg-surface);
-            border-top: 1px solid var(--border-subtle);
-            padding: 20px 24px;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: auto;
-        }
-
-        .site-footer-inner {
-            max-width: 1240px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}">
+    
     @yield('styles')
 </head>
 <body>
     @auth
-    <!-- Main Navigation Bar -->
+    <!-- M3 Top App Bar -->
     <header class="navbar">
         <div class="navbar-container">
             <a href="{{ route('dashboard') }}" class="navbar-brand">
@@ -526,73 +35,147 @@
                 <div class="brand-meta">
                     <div class="brand-title">
                         SIMAK UNIVERSE
-                        <span class="brand-badge">EAI v2.0</span>
+                        <span class="m3-badge-pill primary" style="font-size: 10px; padding: 2px 8px;">EAI v2.0</span>
                     </div>
                     <div class="brand-subtitle">Portal Informasi Akademik Terintegrasi</div>
                 </div>
             </a>
 
-            <nav class="nav-menu">
+            <!-- Navigation Pills -->
+            <nav class="nav-links">
                 <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     Dashboard
                 </a>
                 @if(Auth::user()->role === 'mahasiswa')
                 <a href="{{ route('krs.index') }}" class="nav-item {{ request()->routeIs('krs.*') ? 'active' : '' }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                     Pengisian KRS
                 </a>
                 <a href="{{ route('wisuda.index') }}" class="nav-item {{ request()->routeIs('wisuda.*') ? 'active' : '' }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                     Pendaftaran Wisuda
                 </a>
                 @endif
             </nav>
 
-            <div class="user-nav-actions">
-                <div class="user-profile-chip">
-                    <div class="avatar-circle">
+            <!-- Actions: Dark Mode Switcher & User Profile -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- M3 Theme Switch Button -->
+                <button type="button" class="m3-theme-toggle" id="theme-toggle-btn" title="Ganti Tema (Terang/Gelap)">
+                    <span id="theme-icon">🌙</span>
+                </button>
+
+                <!-- User Profile Chip -->
+                <div style="display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 6px; border-radius: var(--radius-pill); background: var(--surface-container-low); border: 1px solid var(--outline-variant);">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
-                    <div class="user-meta-text">
-                        <span class="user-display-name">{{ Auth::user()->name }}</span>
-                        <span class="user-role-label">{{ Auth::user()->role }} ({{ Auth::user()->username }})</span>
+                    <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
+                        <span style="font-size: 12.5px; font-weight: 700; color: var(--on-surface);">{{ Auth::user()->name }}</span>
+                        <span style="font-size: 10.5px; color: var(--on-surface-variant); text-transform: capitalize;">{{ Auth::user()->role }} ({{ Auth::user()->username }})</span>
                     </div>
                 </div>
-                <form action="{{ route('logout') }}" method="POST">
+
+                <!-- Logout Button -->
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="btn-logout-minimal" title="Keluar dari sesi ini">Keluar</button>
+                    <button type="submit" class="btn-modern secondary sm" title="Keluar dari sesi ini">
+                        Keluar
+                    </button>
                 </form>
             </div>
         </div>
     </header>
     @endauth
 
-    <main class="page-content">
-        @if(session('success'))
-            <div class="banner-alert success">
-                <span style="font-size: 16px;">✓</span>
-                <div>{{ session('success') }}</div>
-            </div>
-        @endif
-
-        @if($errors->any())
-            <div class="banner-alert danger">
-                <span style="font-size: 16px;">✕</span>
-                <div>
-                    @foreach($errors->all() as $error)
-                        <p>{!! $error !!}</p>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
+    <!-- Main Page Content -->
+    <main style="max-width: 1240px; margin: 0 auto; padding: 28px 24px 60px; width: 100%; flex: 1;">
         @yield('content')
     </main>
 
-    <footer class="site-footer">
-        <div class="site-footer-inner">
-            <p>&copy; 2026 SIMAK UNIVERSE. Sistem Informasi Akademik Terpadu.</p>
-            <p style="font-family: var(--font-mono); font-size: 11px;">SIMAK Portal</p>
+    <!-- M3 Floating Toast Notification Container (Tanpa Background Abu-abu) -->
+    <div class="m3-toast-container" id="toast-container">
+        @if(session('success'))
+            <div class="m3-toast success">
+                <div class="m3-toast-icon">✓</div>
+                <div class="m3-toast-content">{{ session('success') }}</div>
+                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        @endif
+
+        @if(session('warning'))
+            <div class="m3-toast warning">
+                <div class="m3-toast-icon">!</div>
+                <div class="m3-toast-content">{{ session('warning') }}</div>
+                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        @endif
+
+        @if(session('error') || $errors->any())
+            <div class="m3-toast error">
+                <div class="m3-toast-icon">✕</div>
+                <div class="m3-toast-content">
+                    @if(session('error'))
+                        <div>{{ session('error') }}</div>
+                    @endif
+                    @if($errors->any())
+                        @foreach($errors->all() as $error)
+                            <div>{!! $error !!}</div>
+                        @endforeach
+                    @endif
+                </div>
+                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        @endif
+    </div>
+
+    <!-- M3 Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 SIMAK UNIVERSE. Sistem Informasi Akademik Terpadu (Material Design 3 Expressive).</p>
+            <p style="font-family: var(--font-mono); font-size: 11.5px; color: var(--on-surface-variant);">SIMAK Portal &bull; Enterprise Application Integration</p>
         </div>
     </footer>
+
+    <!-- Theme Switcher & Toast Auto-dismiss Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleBtn = document.getElementById('theme-toggle-btn');
+            var themeIcon = document.getElementById('theme-icon');
+
+            function updateThemeUI(theme) {
+                if (themeIcon) {
+                    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+                }
+            }
+
+            var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            updateThemeUI(currentTheme);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    var nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', nextTheme);
+                    document.documentElement.setAttribute('data-bs-theme', nextTheme);
+                    document.documentElement.style.colorScheme = nextTheme;
+                    localStorage.setItem('simak-theme', nextTheme);
+                    updateThemeUI(nextTheme);
+                });
+            }
+
+            // Auto dismiss toasts after 5 seconds
+            var toasts = document.querySelectorAll('.m3-toast');
+            toasts.forEach(function(toast) {
+                setTimeout(function() {
+                    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(10px) scale(0.95)';
+                    setTimeout(function() { toast.remove(); }, 300);
+                }, 5000);
+            });
+        });
+    </script>
 
     @yield('scripts')
 </body>

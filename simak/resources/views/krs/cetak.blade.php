@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>KRS - {{ $mahasiswa->nim }} - {{ $mahasiswa->nama }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
             font-size: 13px;
             color: #111;
             padding: 30px;
@@ -21,6 +24,7 @@
             font-size: 18px;
             margin-bottom: 4px;
             text-transform: uppercase;
+            font-weight: 700;
         }
         .header p {
             font-size: 12px;
@@ -47,7 +51,7 @@
         }
         .data-table th {
             background-color: #f2f2f2;
-            font-weight: bold;
+            font-weight: 700;
         }
         .signatures {
             margin-top: 40px;
@@ -74,7 +78,7 @@
 </head>
 <body>
     <div class="no-print" style="margin-bottom: 20px; text-align: right;">
-        <button onclick="window.print()" style="padding: 8px 18px; font-size: 13px; font-weight: bold; cursor: pointer; background: #1e3a8a; color: #fff; border: none; border-radius: 4px;">
+        <button onclick="window.print()" style="padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; background: #65558f; color: #fff; border: none; border-radius: 9999px; font-family: 'Google Sans', sans-serif;">
             Cetak Dokumen KRS
         </button>
     </div>
@@ -100,10 +104,10 @@
             <td>: {{ $mahasiswa->program_studi }}</td>
         </tr>
         <tr>
-            <td><strong>Semester / Angkatan</strong></td>
-            <td>: Semester {{ $krs->semester }} / {{ $mahasiswa->angkatan }}</td>
-            <td><strong>Status KRS</strong></td>
-            <td>: {{ strtoupper($krs->status_krs) }} (UKT Terverifikasi Lunas)</td>
+            <td><strong>Semester</strong></td>
+            <td>: Semester {{ $krs->semester }}</td>
+            <td><strong>Batas Beban SKS</strong></td>
+            <td>: {{ $mahasiswa->batas_sks }} SKS</td>
         </tr>
     </table>
 
@@ -111,11 +115,11 @@
         <thead>
             <tr>
                 <th style="width: 30px; text-align: center;">No</th>
-                <th style="width: 80px;">Kode MK</th>
+                <th style="width: 90px;">Kode MK</th>
                 <th>Nama Mata Kuliah</th>
-                <th style="width: 40px; text-align: center;">SKS</th>
-                <th style="width: 140px;">Hari & Jam Kuliah</th>
-                <th style="width: 90px;">Ruangan</th>
+                <th style="width: 50px; text-align: center;">SKS</th>
+                <th style="width: 180px;">Jadwal Perkuliahan</th>
+                <th style="width: 80px;">Ruangan</th>
             </tr>
         </thead>
         <tbody>
@@ -123,33 +127,34 @@
             @foreach($krs->details as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
-                <td><strong>{{ $item->mataKuliah->kode_mk }}</strong></td>
-                <td>{{ $item->mataKuliah->nama_mk }}</td>
+                <td style="font-family: 'Google Sans Mono', monospace;">{{ $item->mataKuliah->kode_mk }}</td>
+                <td><strong>{{ $item->mataKuliah->nama_mk }}</strong></td>
                 <td style="text-align: center;">{{ $item->mataKuliah->sks }}</td>
                 <td>{{ $item->mataKuliah->hari }}, {{ substr($item->mataKuliah->jam_mulai, 0, 5) }} - {{ substr($item->mataKuliah->jam_selesai, 0, 5) }}</td>
                 <td>{{ $item->mataKuliah->ruangan }}</td>
             </tr>
             @endforeach
             <tr style="font-weight: bold; background-color: #fafafa;">
-                <td colspan="3" style="text-align: right;">Total SKS yang Diprogramkan:</td>
-                <td style="text-align: center;">{{ $krs->total_sks }}</td>
-                <td colspan="2">SKS</td>
+                <td colspan="3" style="text-align: right; padding-right: 12px;">Total SKS yang Diambil:</td>
+                <td style="text-align: center;">{{ $krs->total_sks }} SKS</td>
+                <td colspan="2"></td>
             </tr>
         </tbody>
     </table>
 
     <div class="signatures">
         <div class="sig-block">
-            <p>Mengetahui,</p>
-            <p>Dosen Pembimbing Akademik</p>
+            <p>Mahasiswa Pemohon,</p>
             <div class="sig-line"></div>
-            <p>NIP. 19800101 200501 1 002</p>
+            <p style="margin-top: 6px;"><strong>{{ $mahasiswa->nama }}</strong></p>
+            <p style="font-size: 11px;">NIM. {{ $mahasiswa->nim }}</p>
         </div>
+
         <div class="sig-block">
-            <p>Kota Kampus, {{ date('d F Y') }}</p>
-            <p>Mahasiswa yang Bersangkutan</p>
+            <p>Dosen Pembimbing Akademik,</p>
             <div class="sig-line"></div>
-            <p><strong>{{ $mahasiswa->nama }}</strong><br>NIM. {{ $mahasiswa->nim }}</p>
+            <p style="margin-top: 6px;"><strong>Dr. Ir. Hendra Wijaya, M.Kom</strong></p>
+            <p style="font-size: 11px;">NIP. 198504122010121003</p>
         </div>
     </div>
 </body>

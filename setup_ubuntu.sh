@@ -539,6 +539,15 @@ fi
 # ------------------------------------------------------------------------------
 echo -e "\n${BOLD}${YELLOW}--- TAHAP 9: MEMASANG CUSTOM COMMAND 'eai' ---${NC}"
 
+# Simpan konfigurasi path ke /etc/eai/config
+mkdir -p /etc/eai
+cat > /etc/eai/config <<EOL
+REPO_DIR="${SCRIPT_DIR}"
+SIMAK_PATH="/var/www/simak"
+BILLING_PATH="/var/www/billing"
+PHP_SERVICE="${PHP_SERVICE}"
+EOL
+
 if [ -f "$SCRIPT_DIR/bin/eai" ]; then
     cp "$SCRIPT_DIR/bin/eai" /usr/local/bin/eai
 elif [ -f "/var/www/simak/../bin/eai" ]; then

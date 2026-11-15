@@ -4,13 +4,13 @@
 
 @section('content')
 <!-- Header Page Info -->
-<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
     <div>
-        <span class="pill-badge success" style="margin-bottom: 6px;">FINANCIAL CORE & GATEWAY</span>
-        <h1 style="font-size: 24px; font-weight: 800; color: var(--text-heading); letter-spacing: -0.02em;">
+        <span class="m3-badge-pill success" style="margin-bottom: 6px;">FINANCIAL CORE & GATEWAY</span>
+        <h1 style="font-size: 26px; font-weight: 700; color: var(--on-surface); letter-spacing: -0.02em;">
             Dashboard Manajemen Billing & Keuangan
         </h1>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+        <p style="font-size: 13.5px; color: var(--on-surface-variant); margin-top: 4px;">
             Pusat Rekonsiliasi Tagihan Mahasiswa, Simulator Gateway Bank, dan Webhook Dispatcher ke SIMAK
         </p>
     </div>
@@ -21,50 +21,50 @@
     </div>
 </div>
 
-<!-- Modern Metric KPI Cards -->
-<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
-    <div class="card-fintech" style="margin-bottom: 0; padding: 18px 20px;">
-        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Total Tagihan Terbit</span>
-        <div style="font-size: 28px; font-weight: 800; color: var(--text-heading); margin-top: 6px; letter-spacing: -0.02em;">
-            {{ $totalTagihanCount }} <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">Invoice</span>
+<!-- Modern Metric KPI Cards (20px Squircle M3 Cards) -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div class="m3-card" style="margin-bottom: 0; padding: 22px 24px; border-radius: var(--radius-lg);">
+        <span style="font-size: 11.5px; font-weight: 600; color: var(--on-surface-variant); text-transform: uppercase; letter-spacing: 0.05em;">Total Tagihan Terbit</span>
+        <div style="font-size: 32px; font-weight: 700; color: var(--on-surface); margin-top: 6px; letter-spacing: -0.02em; font-family: var(--font-display);">
+            {{ $totalTagihanCount }} <span style="font-size: 14px; font-weight: 500; color: var(--on-surface-variant);">Invoice</span>
         </div>
-        <span style="font-size: 12px; color: var(--text-muted);">Akumulasi seluruh semester</span>
+        <span style="font-size: 12px; color: var(--on-surface-variant);">Akumulasi seluruh semester</span>
     </div>
 
-    <div class="card-fintech" style="margin-bottom: 0; padding: 18px 20px; border-top: 3px solid #10b981;">
-        <span style="font-size: 11px; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.05em;">Penerimaan Lunas (PAID)</span>
-        <div style="font-size: 24px; font-weight: 800; color: #065f46; margin-top: 6px; letter-spacing: -0.01em;">
+    <div class="m3-card" style="margin-bottom: 0; padding: 22px 24px; border-radius: var(--radius-lg); border-top: 3px solid var(--success);">
+        <span style="font-size: 11.5px; font-weight: 600; color: var(--success); text-transform: uppercase; letter-spacing: 0.05em;">Penerimaan Lunas (PAID)</span>
+        <div style="font-size: 26px; font-weight: 700; color: var(--success); margin-top: 6px; letter-spacing: -0.01em; font-family: var(--font-display);">
             Rp {{ number_format($totalNominalPaid, 0, ',', '.') }}
         </div>
-        <span style="font-size: 12px; color: #059669;">Dana terverifikasi masuk</span>
+        <span style="font-size: 12px; color: var(--success);">Dana terverifikasi masuk</span>
     </div>
 
-    <div class="card-fintech" style="margin-bottom: 0; padding: 18px 20px; border-top: 3px solid #f59e0b;">
-        <span style="font-size: 11px; font-weight: 700; color: #b45309; text-transform: uppercase; letter-spacing: 0.05em;">Piutang Berjalan (UNPAID)</span>
-        <div style="font-size: 24px; font-weight: 800; color: #92400e; margin-top: 6px; letter-spacing: -0.01em;">
+    <div class="m3-card" style="margin-bottom: 0; padding: 22px 24px; border-radius: var(--radius-lg); border-top: 3px solid var(--warning);">
+        <span style="font-size: 11.5px; font-weight: 600; color: var(--warning); text-transform: uppercase; letter-spacing: 0.05em;">Piutang Berjalan (UNPAID)</span>
+        <div style="font-size: 26px; font-weight: 700; color: var(--warning); margin-top: 6px; letter-spacing: -0.01em; font-family: var(--font-display);">
             Rp {{ number_format($totalNominalUnpaid, 0, ',', '.') }}
         </div>
-        <span style="font-size: 12px; color: #b45309;">Menunggu penyelesaian</span>
+        <span style="font-size: 12px; color: var(--warning);">Menunggu penyelesaian</span>
     </div>
 
-    <div class="card-fintech" style="margin-bottom: 0; padding: 18px 20px; border-top: 3px solid #ef4444;">
-        <span style="font-size: 11px; font-weight: 700; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.05em;">Invoice Menunggu Bayar</span>
-        <div style="font-size: 28px; font-weight: 800; color: #b91c1c; margin-top: 6px; letter-spacing: -0.02em;">
-            {{ $unpaidCount }} <span style="font-size: 14px; font-weight: 500; color: #dc2626;">Invoice</span>
+    <div class="m3-card" style="margin-bottom: 0; padding: 22px 24px; border-radius: var(--radius-lg); border-top: 3px solid var(--error);">
+        <span style="font-size: 11.5px; font-weight: 600; color: var(--error); text-transform: uppercase; letter-spacing: 0.05em;">Invoice Menunggu Bayar</span>
+        <div style="font-size: 32px; font-weight: 700; color: var(--error); margin-top: 6px; letter-spacing: -0.02em; font-family: var(--font-display);">
+            {{ $unpaidCount }} <span style="font-size: 14px; font-weight: 500; color: var(--error);">Invoice</span>
         </div>
-        <span style="font-size: 12px; color: var(--text-muted);">Belum diverifikasi lunas</span>
+        <span style="font-size: 12px; color: var(--on-surface-variant);">Belum diverifikasi lunas</span>
     </div>
 </div>
 
-<!-- INTERACTIVE PAYMENT SIMULATOR CARD -->
-<div class="card-fintech" style="border: 2px solid #0f766e; background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);">
-    <div class="card-header-fintech" style="border-color: #ccfbf1;">
+<!-- INTERACTIVE PAYMENT SIMULATOR CARD (20px Squircle M3 Feature Card) -->
+<div class="m3-card" style="border: 2px solid var(--primary); background: var(--surface-container-low); border-radius: var(--radius-lg);">
+    <div class="m3-card-header" style="border-bottom-color: var(--outline-variant);">
         <div>
-            <span class="pill-badge success" style="margin-bottom: 4px; font-size: 10px;">EAI LIVE DEMO CONSOLE</span>
-            <h2 class="card-title-fintech" style="color: #0f766e; font-size: 18px;">
+            <span class="m3-badge-pill success" style="margin-bottom: 4px; font-size: 10px;">EAI LIVE DEMO CONSOLE</span>
+            <h2 class="m3-card-title" style="color: var(--primary); font-size: 18px;">
                 Simulator Pembayaran Bank & Webhook Dispatcher
             </h2>
-            <p class="card-subtitle-fintech" style="color: #115e59;">
+            <p class="m3-card-subtitle">
                 Gunakan simulator ini untuk melunasi tagihan Virtual Account dan menguji pengiriman Webhook Asinkron ke SIMAK (Port 8000)
             </p>
         </div>
@@ -72,12 +72,12 @@
 
     <form action="{{ route('billing.simulasi_bayar') }}" method="POST">
         @csrf
-        <div style="display: grid; grid-template-columns: 2fr 1.3fr 1.1fr; gap: 16px; align-items: flex-end;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; align-items: flex-end;">
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 700; color: #134e4a; margin-bottom: 6px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: var(--on-surface); margin-bottom: 6px;">
                     PILIH TAGIHAN MAHASISWA BELUM LUNAS (UNPAID)
                 </label>
-                <select id="select-unpaid" onchange="autoFillVa(this)" style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #99f6e4; border-radius: var(--radius-md); font-size: 13px; font-family: var(--font-sans); background:#fff; color: var(--text-heading); outline: none;">
+                <select id="select-unpaid" onchange="autoFillVa(this)" style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); font-size: 13.5px; font-family: var(--font-sans); background: var(--surface-container-lowest); color: var(--on-surface); outline: none;">
                     <option value="">-- Pilih Tagihan untuk Disimulasikan --</option>
                     @foreach($unpaidInvoices as $inv)
                         <option value="{{ $inv->nomor_va }}" data-invoice="{{ $inv->nomor_invoice }}" data-nominal="Rp {{ number_format($inv->jumlah_tagihan, 0, ',', '.') }}" data-nama="{{ $inv->mahasiswa->nama ?? $inv->nim }}">
@@ -88,18 +88,18 @@
             </div>
 
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 700; color: #134e4a; margin-bottom: 6px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: var(--on-surface); margin-bottom: 6px;">
                     NOMOR VIRTUAL ACCOUNT (VA)
                 </label>
                 <input type="text" name="nomor_va" id="input-va" required placeholder="Contoh: 8808210101001001"
-                       style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #99f6e4; border-radius: var(--radius-md); font-size: 14px; font-family: var(--font-mono); font-weight: 700; background:#fff; color: var(--brand-fintech); outline: none;">
+                       style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); font-size: 15px; font-family: var(--font-mono); font-weight: 700; background: var(--surface-container-lowest); color: var(--primary); outline: none;">
             </div>
 
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 700; color: #134e4a; margin-bottom: 6px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: var(--on-surface); margin-bottom: 6px;">
                     KANAL PEMBAYARAN BANK
                 </label>
-                <select name="channel_bayar" style="width: 100%; height: 42px; padding: 0 10px; border: 1px solid #99f6e4; border-radius: var(--radius-md); font-size: 13px; font-family: var(--font-sans); background:#fff; outline: none;">
+                <select name="channel_bayar" style="width: 100%; height: 46px; padding: 0 14px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); font-size: 13.5px; font-family: var(--font-sans); background: var(--surface-container-lowest); color: var(--on-surface); outline: none;">
                     <option value="M-BANKING SIMULATOR (MANDIRI)">M-Banking Mandiri</option>
                     <option value="M-BANKING SIMULATOR (BCA)">M-Banking BCA</option>
                     <option value="M-BANKING SIMULATOR (BNI)">M-Banking BNI</option>
@@ -109,11 +109,11 @@
             </div>
         </div>
 
-        <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px dashed #99f6e4;">
-            <div id="preview-tagihan" style="font-size: 13px; color: #0f766e;">
+        <div style="margin-top: 18px; display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px dashed var(--outline-variant); flex-wrap: wrap; gap: 12px;">
+            <div id="preview-tagihan" style="font-size: 13.5px; color: var(--primary);">
                 Pilih salah satu tagihan di atas untuk melihat detail.
             </div>
-            <button type="submit" class="btn-fintech primary" style="font-size: 13px;">
+            <button type="submit" class="btn-fintech primary" style="font-size: 13.5px;">
                 Proses Pembayaran & Trigger Webhook &rarr;
             </button>
         </div>
@@ -121,11 +121,11 @@
 </div>
 
 <!-- TABEL DAFTAR TAGIHAN FINANSIAL -->
-<div class="card-fintech">
-    <div class="card-header-fintech">
+<div class="m3-card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 22px 24px; border-bottom: 1px solid var(--outline-variant); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div>
-            <h2 class="card-title-fintech">Daftar Tagihan Mahasiswa (Klik Baris untuk Detail & Modifikasi)</h2>
-            <p class="card-subtitle-fintech">Klik pada baris transaksi mana saja untuk memunculkan modal rincian dan mengubah status pembayaran secara manual</p>
+            <h2 class="m3-card-title">Daftar Tagihan Mahasiswa (Klik Baris untuk Detail & Modifikasi)</h2>
+            <p class="m3-card-subtitle">Klik pada baris transaksi mana saja untuk memunculkan modal rincian dan mengubah status pembayaran secara manual</p>
         </div>
         <div style="display: flex; gap: 6px;">
             <a href="{{ route('billing.dashboard', ['status' => 'ALL']) }}" class="btn-fintech {{ $filterStatus == 'ALL' ? 'primary' : 'secondary' }} sm">Semua</a>
@@ -134,8 +134,8 @@
         </div>
     </div>
 
-    <div class="table-responsive-fintech">
-        <table class="table-fintech">
+    <div class="m3-table-container" style="border: none; border-radius: 0; margin-bottom: 0;">
+        <table class="m3-table">
             <thead>
                 <tr>
                     <th>Nomor Invoice</th>
@@ -173,38 +173,38 @@
                     ];
                 @endphp
                 <tr class="row-clickable" onclick="openDetailModal({{ json_encode($tagihanData) }})" style="cursor: pointer;">
-                    <td><code>{{ $tagihan->nomor_invoice }}</code></td>
+                    <td><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px;">{{ $tagihan->nomor_invoice }}</code></td>
                     <td>
-                        <strong style="color: var(--text-heading);">{{ $tagihan->nim }}</strong>
-                        <div style="font-size: 11px; color: var(--text-muted);">{{ $tagihan->mahasiswa->nama ?? '-' }}</div>
+                        <strong style="color: var(--on-surface);">{{ $tagihan->nim }}</strong>
+                        <div style="font-size: 11.5px; color: var(--on-surface-variant);">{{ $tagihan->mahasiswa->nama ?? '-' }}</div>
                     </td>
                     <td>
                         @if($tagihan->jenis_tagihan === 'UKT')
-                            <span class="pill-badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">UKT</span>
+                            <span class="m3-badge-pill" style="background: var(--secondary-container); color: var(--on-secondary-container);">UKT</span>
                         @elseif($tagihan->jenis_tagihan === 'WISUDA')
-                            <span class="pill-badge" style="background:#f3e8ff; color:#7e22ce; border:1px solid #e9d5ff;">WISUDA</span>
+                            <span class="m3-badge-pill" style="background: var(--primary-container); color: var(--on-primary-container);">WISUDA</span>
                         @else
-                            <span class="pill-badge danger">DENDA</span>
+                            <span class="m3-badge-pill danger">DENDA</span>
                         @endif
                     </td>
                     <td>{{ $tagihan->semester ?? '-' }}</td>
-                    <td><strong style="color: var(--text-heading);">Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}</strong></td>
+                    <td><strong style="color: var(--on-surface);">Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}</strong></td>
                     <td>
-                        <span style="font-family: var(--font-mono); font-weight: 700; color: #0f766e;">{{ $tagihan->nomor_va }}</span>
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary);">{{ $tagihan->nomor_va }}</span>
                     </td>
                     <td>
                         @if($tagihan->status_pembayaran === 'PAID')
-                            <span class="pill-badge success">PAID</span>
+                            <span class="m3-badge-pill success">PAID</span>
                         @else
-                            <span class="pill-badge danger">UNPAID</span>
+                            <span class="m3-badge-pill danger">UNPAID</span>
                         @endif
                     </td>
                     <td>
                         @if($tagihan->status_pembayaran === 'PAID')
                             <div style="font-size: 12px; font-weight: 600;">{{ $tagihan->channel_bayar }}</div>
-                            <div style="font-size: 11px; color: var(--text-muted);">{{ $tagihan->tanggal_bayar ? $tagihan->tanggal_bayar->format('d/m/Y H:i') : '' }}</div>
+                            <div style="font-size: 11px; color: var(--on-surface-variant);">{{ $tagihan->tanggal_bayar ? $tagihan->tanggal_bayar->format('d/m/Y H:i') : '' }}</div>
                         @else
-                            <span style="color: var(--text-muted); font-size: 11px;">Jatuh tempo: {{ $tagihan->tanggal_jatuh_tempo ? $tagihan->tanggal_jatuh_tempo->format('d/m/Y') : '-' }}</span>
+                            <span style="color: var(--on-surface-variant); font-size: 11.5px;">Jatuh tempo: {{ $tagihan->tanggal_jatuh_tempo ? $tagihan->tanggal_jatuh_tempo->format('d/m/Y') : '-' }}</span>
                         @endif
                     </td>
                     <td style="text-align: right;" onclick="event.stopPropagation();">
@@ -215,7 +215,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    <td colspan="9" style="text-align: center; color: var(--on-surface-variant); padding: 30px;">
                         Tidak ada transaksi tagihan yang sesuai dengan filter.
                     </td>
                 </tr>
@@ -224,23 +224,23 @@
         </table>
     </div>
 
-    <div style="margin-top: 16px;">
+    <div style="padding: 16px 24px;">
         {{ $tagihanList->links() }}
     </div>
 </div>
 
 <!-- AUDIT LOG WEBHOOK EVENT DISPATCHER -->
-<div class="card-fintech">
-    <div class="card-header-fintech">
+<div class="m3-card" style="padding: 0; overflow: hidden; margin-top: 24px;">
+    <div style="padding: 22px 24px; border-bottom: 1px solid var(--outline-variant); display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h2 class="card-title-fintech">Audit Log Webhook Event Dispatcher (EAI Asynchronous Callback)</h2>
-            <p class="card-subtitle-fintech">Riwayat transmisi HTTP webhook callback yang dikirim ke SIMAK (Port 8000) saat tagihan wisuda diverifikasi</p>
+            <h2 class="m3-card-title">Audit Log Webhook Event Dispatcher (EAI Asynchronous Callback)</h2>
+            <p class="m3-card-subtitle">Riwayat transmisi HTTP webhook callback yang dikirim ke SIMAK (Port 8000) saat tagihan wisuda diverifikasi</p>
         </div>
-        <span class="pill-badge neutral">10 Riwayat Terakhir</span>
+        <span class="m3-badge-pill neutral">10 Riwayat Terakhir</span>
     </div>
 
-    <div class="table-responsive-fintech">
-        <table class="table-fintech">
+    <div class="m3-table-container" style="border: none; border-radius: 0; margin-bottom: 0;">
+        <table class="m3-table">
             <thead>
                 <tr>
                     <th>Waktu Pengiriman</th>
@@ -255,31 +255,31 @@
                 @forelse($webhookLogs as $log)
                 <tr>
                     <td style="font-size: 11px; white-space: nowrap; font-family: var(--font-mono);">{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
-                    <td><strong style="color: var(--text-heading);">{{ $log->event_name }}</strong></td>
-                    <td><code>{{ $log->target_url }}</code></td>
+                    <td><strong style="color: var(--on-surface);">{{ $log->event_name }}</strong></td>
+                    <td><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px;">{{ $log->target_url }}</code></td>
                     <td>
                         @if($log->response_code == 200)
-                            <span class="pill-badge success">200 OK</span>
+                            <span class="m3-badge-pill success">200 OK</span>
                         @else
-                            <span class="pill-badge danger">{{ $log->response_code ?? 'FAILED' }}</span>
+                            <span class="m3-badge-pill danger">{{ $log->response_code ?? 'FAILED' }}</span>
                         @endif
                     </td>
                     <td>
                         @if($log->is_success)
-                            <span class="pill-badge success">BERHASIL DITERIMA</span>
+                            <span class="m3-badge-pill success">BERHASIL DITERIMA</span>
                         @else
-                            <span class="pill-badge danger">GAGAL</span>
+                            <span class="m3-badge-pill danger">GAGAL</span>
                         @endif
                     </td>
                     <td>
-                        <div style="max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);" title="{{ $log->payload }}">
+                        <div style="max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: 11px; color: var(--on-surface-variant);" title="{{ $log->payload }}">
                             {{ $log->payload }}
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                    <td colspan="6" style="text-align: center; color: var(--on-surface-variant); padding: 24px;">
                         Belum ada transmisi event webhook. Lakukan pelunasan paket wisuda untuk memicu callback otomatis.
                     </td>
                 </tr>
@@ -289,87 +289,87 @@
     </div>
 </div>
 
-<!-- POPUP MODAL DETAIL & MODIFIKASI STATUS PELUNASAN -->
-<div id="modal-detail" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); z-index: 200; align-items: center; justify-content: center; padding: 20px;">
-    <div class="modal-card" style="background: #ffffff; border-radius: var(--radius-lg); width: 100%; max-width: 620px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column;">
+<!-- POPUP MODAL DETAIL & MODIFIKASI STATUS PELUNASAN (M3 DIALOG 28PX SQUIRCLE) -->
+<div id="modal-detail" class="m3-dialog-backdrop" style="display: none;">
+    <div class="m3-dialog" style="max-width: 600px; padding: 28px; background: var(--surface-container-high); border-radius: var(--radius-xl); box-shadow: 0 16px 32px rgba(0,0,0,0.25);">
         <!-- Modal Header -->
-        <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+        <div style="padding-bottom: 16px; border-bottom: 1px solid var(--outline-variant); display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <span id="modal-jenis-badge" class="pill-badge" style="margin-bottom: 4px;">JENIS</span>
-                <h3 id="modal-invoice-title" style="font-size: 18px; font-weight: 800; color: var(--text-heading);">INV-0000</h3>
+                <span id="modal-jenis-badge" class="m3-badge-pill" style="margin-bottom: 4px;">JENIS</span>
+                <h3 id="modal-invoice-title" style="font-size: 20px; font-weight: 700; color: var(--on-surface); font-family: var(--font-display);">INV-0000</h3>
             </div>
-            <button type="button" onclick="closeDetailModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); line-height: 1; padding: 4px;">&times;</button>
+            <button type="button" onclick="closeDetailModal()" class="m3-toast-close" style="font-size: 24px;">&times;</button>
         </div>
 
         <!-- Modal Body Scrollable -->
-        <div style="padding: 24px; overflow-y: auto; flex: 1;">
+        <div style="padding: 20px 0; max-height: 65vh; overflow-y: auto;">
             <!-- Rincian Mahasiswa & Tagihan -->
-            <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+            <div class="m3-inner-block" style="margin-bottom: 20px; background: var(--surface-container-low);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; font-size: 13px;">
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">NIM & Mahasiswa</span>
-                        <strong id="modal-nama">-</strong> (<span id="modal-nim">-</span>)
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">NIM & Mahasiswa</span>
+                        <strong id="modal-nama" style="color: var(--on-surface);">-</strong> (<span id="modal-nim">-</span>)
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Program Studi</span>
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Program Studi</span>
                         <span id="modal-prodi">-</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Nomor Virtual Account</span>
-                        <span id="modal-va" style="font-family: var(--font-mono); font-weight: 800; color: #0f766e; font-size: 14px;">-</span>
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Nomor Virtual Account</span>
+                        <span id="modal-va" style="font-family: var(--font-mono); font-weight: 700; color: var(--primary); font-size: 15px;">-</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Jumlah Tagihan</span>
-                        <strong id="modal-nominal" style="font-size: 15px; color: var(--text-heading);">-</strong>
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Jumlah Tagihan</span>
+                        <strong id="modal-nominal" style="font-size: 16px; color: var(--on-surface); font-family: var(--font-display);">-</strong>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Deskripsi Tagihan</span>
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Deskripsi Tagihan</span>
                         <span id="modal-deskripsi">-</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Jatuh Tempo</span>
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Jatuh Tempo</span>
                         <span id="modal-tempo">-</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Status Pelunasan</span>
-                        <span id="modal-status-badge" class="pill-badge">STATUS</span>
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Status Pelunasan</span>
+                        <span id="modal-status-badge" class="m3-badge-pill">STATUS</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Waktu & Kanal Bayar</span>
+                        <span style="color: var(--on-surface-variant); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;">Waktu & Kanal Bayar</span>
                         <span id="modal-waktu-bayar">-</span>
                     </div>
                 </div>
             </div>
 
             <!-- FORM MODIFIKASI STATUS PELUNASAN OLEH ADMIN -->
-            <div style="border: 1px solid #ccfbf1; background: #f0fdfa; border-radius: var(--radius-md); padding: 18px;">
-                <h4 style="font-size: 14px; font-weight: 800; color: #0f766e; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <div style="border: 1px solid var(--outline-variant); background: var(--surface-container-lowest); border-radius: var(--radius-sm); padding: 18px;">
+                <h4 style="font-size: 14.5px; font-weight: 700; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">
                     Modifikasi Status Pelunasan oleh Admin Keuangan
                 </h4>
 
                 <form id="form-update-status" method="POST" action="">
                     @csrf
-                    <div style="margin-bottom: 14px;">
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: #134e4a; margin-bottom: 6px;">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: var(--on-surface); margin-bottom: 8px;">
                             Ubah Status Pembayaran:
                         </label>
                         <div style="display: flex; gap: 20px;">
-                            <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;">
-                                <input type="radio" name="status_pembayaran" value="PAID" id="radio-paid" onchange="toggleKanalBayar(this.value)">
-                                <strong style="color: var(--status-success-text);">PAID (Lunas)</strong>
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 13.5px; cursor: pointer;">
+                                <input type="radio" name="status_pembayaran" value="PAID" id="radio-paid" onchange="toggleKanalBayar(this.value)" style="accent-color: var(--primary); width: 16px; height: 16px;">
+                                <strong style="color: var(--success);">PAID (Lunas)</strong>
                             </label>
-                            <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;">
-                                <input type="radio" name="status_pembayaran" value="UNPAID" id="radio-unpaid" onchange="toggleKanalBayar(this.value)">
-                                <strong style="color: var(--status-danger-text);">UNPAID (Belum Lunas / Batal)</strong>
+                            <label style="display: flex; align-items: center; gap: 6px; font-size: 13.5px; cursor: pointer;">
+                                <input type="radio" name="status_pembayaran" value="UNPAID" id="radio-unpaid" onchange="toggleKanalBayar(this.value)" style="accent-color: var(--error); width: 16px; height: 16px;">
+                                <strong style="color: var(--error);">UNPAID (Belum Lunas / Batal)</strong>
                             </label>
                         </div>
                     </div>
 
-                    <div id="wrapper-kanal-bayar" style="margin-bottom: 14px;">
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: #134e4a; margin-bottom: 4px;">
+                    <div id="wrapper-kanal-bayar" style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: var(--on-surface); margin-bottom: 6px;">
                             Metode / Kanal Pembayaran:
                         </label>
-                        <select name="channel_bayar" id="select-modal-channel" style="width: 100%; height: 38px; padding: 0 10px; border: 1px solid #99f6e4; border-radius: var(--radius-md); font-size: 13px; font-family: var(--font-sans); background:#fff;">
+                        <select name="channel_bayar" id="select-modal-channel" style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); font-size: 13px; font-family: var(--font-sans); background: var(--surface-container-low); color: var(--on-surface);">
                             <option value="KASIR KEUANGAN (UPDATE ADMIN)">Kasir Keuangan (Setoran Tunai)</option>
                             <option value="TRANSFER BANK (VERIFIKASI MANUAL)">Transfer Bank (Verifikasi Manual)</option>
                             <option value="M-BANKING SIMULATOR">M-Banking Simulator</option>
@@ -377,11 +377,11 @@
                         </select>
                     </div>
 
-                    <div id="modal-eai-notice" style="font-size: 12px; color: #047857; margin-bottom: 16px; padding: 10px 14px; background: #ecfdf5; border-radius: 6px; border: 1px dashed #a7f3d0; display: none;">
+                    <div id="modal-eai-notice" style="font-size: 12px; color: var(--success); margin-bottom: 16px; padding: 12px 14px; background: var(--success-container); border-radius: var(--radius-sm); display: none;">
                         <strong>Integrasi EAI:</strong> Mengubah status tagihan paket wisuda ini akan secara otomatis memancarkan Webhook Callback ke SIMAK (Port 8000) untuk sinkronisasi seketika.
                     </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #ccfbf1; padding-top: 12px;">
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--outline-variant); padding-top: 14px;">
                         <button type="button" onclick="closeDetailModal()" class="btn-fintech secondary sm">Batal</button>
                         <button type="submit" class="btn-fintech primary sm">Simpan Perubahan Status &rarr;</button>
                     </div>
@@ -424,21 +424,24 @@
         const jenisBadge = document.getElementById('modal-jenis-badge');
         jenisBadge.textContent = data.jenis_tagihan;
         if (data.jenis_tagihan === 'UKT') {
-            jenisBadge.style.cssText = 'background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;';
+            jenisBadge.className = 'm3-badge-pill';
+            jenisBadge.style.cssText = 'background: var(--secondary-container); color: var(--on-secondary-container);';
         } else if (data.jenis_tagihan === 'WISUDA') {
-            jenisBadge.style.cssText = 'background:#f3e8ff; color:#7e22ce; border:1px solid #e9d5ff;';
+            jenisBadge.className = 'm3-badge-pill';
+            jenisBadge.style.cssText = 'background: var(--primary-container); color: var(--on-primary-container);';
         } else {
-            jenisBadge.style.cssText = 'background:#fee2e2; color:#b91c1c; border:1px solid #fecaca;';
+            jenisBadge.className = 'm3-badge-pill danger';
+            jenisBadge.style.cssText = '';
         }
 
         const statusBadge = document.getElementById('modal-status-badge');
         statusBadge.textContent = data.status_pembayaran;
         if (data.status_pembayaran === 'PAID') {
-            statusBadge.className = 'pill-badge success';
+            statusBadge.className = 'm3-badge-pill success';
             document.getElementById('radio-paid').checked = true;
             toggleKanalBayar('PAID');
         } else {
-            statusBadge.className = 'pill-badge danger';
+            statusBadge.className = 'm3-badge-pill danger';
             document.getElementById('radio-unpaid').checked = true;
             toggleKanalBayar('UNPAID');
         }

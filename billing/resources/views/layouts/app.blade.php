@@ -1,427 +1,179 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Financial Dashboard') | Total Billing System</title>
-    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    
+    <!-- Instant Anti-FOUC Theme Initializer -->
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('billing-theme') || 
+                                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.documentElement.setAttribute('data-bs-theme', savedTheme);
+                document.documentElement.style.colorScheme = savedTheme;
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Google Fonts Preconnect & M3 Fintech Core CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-base: #f8fafc;
-            --bg-surface: #ffffff;
-            --bg-subtle: #f1f5f9;
-            --border-subtle: #e2e8f0;
-            --border-strong: #cbd5e1;
-
-            --brand-fintech: #0f766e;
-            --brand-fintech-hover: #115e59;
-            --brand-fintech-surface: #f0fdfa;
-            --brand-fintech-border: #99f6e4;
-            --brand-accent: #059669;
-
-            --text-heading: #0f172a;
-            --text-body: #334155;
-            --text-muted: #64748b;
-
-            --status-success-bg: #ecfdf5;
-            --status-success-border: #a7f3d0;
-            --status-success-text: #065f46;
-
-            --status-danger-bg: #fef2f2;
-            --status-danger-border: #fecaca;
-            --status-danger-text: #991b1b;
-
-            --status-warning-bg: #fffbeb;
-            --status-warning-border: #fde68a;
-            --status-warning-text: #92400e;
-
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --radius-pill: 9999px;
-
-            --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-            --shadow-sm: 0 2px 4px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-            --shadow-md: 0 4px 8px -2px rgba(15, 23, 42, 0.08);
-
-            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--bg-base);
-            color: var(--text-body);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Top Bar Fintech */
-        .billing-topbar {
-            background: #0f172a;
-            color: #94a3b8;
-            font-size: 11px;
-            padding: 6px 24px;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        .billing-topbar-inner {
-            max-width: 1240px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .pulse-live {
-            width: 7px;
-            height: 7px;
-            background-color: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-            box-shadow: 0 0 6px #10b981;
-        }
-
-        .navbar {
-            background-color: var(--bg-surface);
-            border-bottom: 1px solid var(--border-subtle);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar-inner {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 0 24px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--text-heading);
-        }
-
-        .brand-badge-box {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 15px;
-            box-shadow: 0 2px 6px rgba(15, 118, 110, 0.25);
-        }
-
-        .brand-text-block {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand-title {
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: -0.01em;
-            color: var(--text-heading);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .brand-tag {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            background: var(--brand-fintech-surface);
-            color: var(--brand-fintech);
-            border-radius: var(--radius-sm);
-            text-transform: uppercase;
-        }
-
-        .brand-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* Container */
-        .page-canvas {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 28px 24px 60px;
-            width: 100%;
-            flex: 1;
-        }
-
-        /* Card Modern */
-        .card-fintech {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 22px 24px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 22px;
-        }
-
-        .card-header-fintech {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-            padding-bottom: 16px;
-            margin-bottom: 18px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .card-title-fintech {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--text-heading);
-            letter-spacing: -0.01em;
-        }
-
-        .card-subtitle-fintech {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        /* Modern Buttons */
-        .btn-fintech {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 8px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: var(--radius-md);
-            border: 1px solid transparent;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.15s ease;
-            min-height: 40px;
-        }
-
-        .btn-fintech.primary {
-            background-color: var(--brand-fintech);
-            color: #ffffff;
-            box-shadow: 0 1px 2px rgba(15, 118, 110, 0.2);
-        }
-
-        .btn-fintech.primary:hover {
-            background-color: var(--brand-fintech-hover);
-        }
-
-        .btn-fintech.secondary {
-            background-color: var(--bg-surface);
-            border-color: var(--border-subtle);
-            color: var(--text-heading);
-        }
-
-        .btn-fintech.secondary:hover {
-            background-color: var(--bg-subtle);
-            border-color: var(--border-strong);
-        }
-
-        .btn-fintech.sm {
-            min-height: 32px;
-            padding: 4px 12px;
-            font-size: 12px;
-        }
-
-        /* Badges */
-        .pill-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: var(--radius-pill);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-        }
-
-        .pill-badge.success {
-            background: var(--status-success-bg);
-            color: var(--status-success-text);
-            border: 1px solid var(--status-success-border);
-        }
-
-        .pill-badge.danger {
-            background: var(--status-danger-bg);
-            color: var(--status-danger-text);
-            border: 1px solid var(--status-danger-border);
-        }
-
-        .pill-badge.warning {
-            background: var(--status-warning-bg);
-            color: var(--status-warning-text);
-            border: 1px solid var(--status-warning-border);
-        }
-
-        .pill-badge.neutral {
-            background: var(--bg-subtle);
-            color: var(--text-muted);
-            border: 1px solid var(--border-subtle);
-        }
-
-        /* Table */
-        .table-responsive-fintech {
-            overflow-x: auto;
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            background: var(--bg-surface);
-        }
-
-        .table-fintech {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: left;
-            font-feature-settings: "tnum";
-        }
-
-        .table-fintech th {
-            background-color: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .table-fintech td {
-            padding: 13px 16px;
-            border-bottom: 1px solid var(--border-subtle);
-            color: var(--text-body);
-        }
-
-        .table-fintech tr:last-child td {
-            border-bottom: none;
-        }
-
-        .table-fintech tr:hover td {
-            background-color: #f0fdfa;
-        }
-
-        code {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            background: var(--bg-subtle);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-heading);
-        }
-
-        .site-footer {
-            background-color: var(--bg-surface);
-            border-top: 1px solid var(--border-subtle);
-            padding: 20px 24px;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: auto;
-        }
-
-        .site-footer-inner {
-            max-width: 1240px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}">
+    
     @yield('styles')
 </head>
 <body>
-    <!-- Main Navigation Bar -->
+    <!-- Live Core Status Bar -->
+    <div class="billing-topbar">
+        <div class="billing-topbar-inner">
+            <div style="display: flex; align-items: center;">
+                <span class="pulse-live"></span>
+                <strong>EAI CORE ACTIVE:</strong>&nbsp; REST API Listener (Port 8001) &bull; Webhook Dispatcher Connected to SIMAK (Port 8000)
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 11px;">
+                Environment: LOCAL SANDBOX
+            </div>
+        </div>
+    </div>
+
+    <!-- M3 Top App Bar -->
     <header class="navbar">
         <div class="navbar-inner">
             <a href="{{ route('billing.dashboard') }}" class="brand-link">
-                <div class="brand-badge-box">B</div>
-                <div class="brand-text-block">
-                    <div class="brand-title">
-                        TOTAL BILLING SYSTEM
-                    </div>
-                    <div class="brand-subtitle">Financial Core & Payment Gateway Service</div>
+                <div class="brand-badge">B</div>
+                <div>
+                    <div class="brand-name">TOTAL BILLING SYSTEM</div>
+                    <div class="brand-tag">Financial Core & Payment Gateway Service</div>
                 </div>
             </a>
 
-            @auth
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <div style="display: flex; flex-direction: column; text-align: right; line-height: 1.2;">
-                    <span style="font-size: 13px; font-weight: 700; color: var(--text-heading);">{{ Auth::user()->name }}</span>
-                    <span style="font-size: 11px; color: var(--text-muted);">{{ Auth::user()->email }}</span>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <!-- Theme Switch Button -->
+                <button type="button" class="m3-theme-toggle" id="theme-toggle-btn" title="Ganti Tema (Terang/Gelap)">
+                    <span id="theme-icon">🌙</span>
+                </button>
+
+                @auth
+                <!-- User Profile Chip -->
+                <div style="display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 6px; border-radius: var(--radius-pill); background: var(--surface-container-low); border: 1px solid var(--outline-variant);">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                    <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
+                        <span style="font-size: 12.5px; font-weight: 700; color: var(--on-surface);">{{ Auth::user()->name }}</span>
+                        <span style="font-size: 10.5px; color: var(--on-surface-variant);">Finance Admin</span>
+                    </div>
                 </div>
-                <form action="{{ route('logout') }}" method="POST">
+
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="btn-fintech secondary sm" style="font-size: 12px;">Keluar</button>
+                    <button type="submit" class="btn-fintech secondary sm" style="font-size: 12px;">
+                        Keluar
+                    </button>
                 </form>
+                @endauth
             </div>
-            @endauth
         </div>
     </header>
 
-    <main class="page-canvas">
+    <!-- Main Page Canvas -->
+    <main style="max-width: 1240px; margin: 0 auto; padding: 28px 24px 60px; width: 100%; flex: 1;">
+        @yield('content')
+    </main>
+
+    <!-- M3 Floating Toast Notification Container (Tanpa Background Abu-abu) -->
+    <div class="m3-toast-container" id="toast-container">
         @if(session('success'))
-            <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--status-success-bg); border: 1px solid var(--status-success-border); color: var(--status-success-text); padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 20px; font-size: 13px;">
-                <span style="font-size: 16px;">✓</span>
-                <div>{{ session('success') }}</div>
+            <div class="m3-toast success">
+                <div class="m3-toast-icon">✓</div>
+                <div class="m3-toast-content">{{ session('success') }}</div>
+                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        @endif
+
+        @if(session('warning'))
+            <div class="m3-toast warning">
+                <div class="m3-toast-icon">!</div>
+                <div class="m3-toast-content">{{ session('warning') }}</div>
+                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
             </div>
         @endif
 
         @if(session('info'))
-            <div style="display: flex; align-items: flex-start; gap: 12px; background: #f0f9ff; border: 1px solid #bae6fd; color: #0369a1; padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 20px; font-size: 13px;">
-                <span style="font-size: 16px;">ℹ</span>
-                <div>{{ session('info') }}</div>
+            <div class="m3-toast success">
+                <div class="m3-toast-icon">ℹ</div>
+                <div class="m3-toast-content">{{ session('info') }}</div>
+                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
             </div>
         @endif
 
-        @if($errors->any())
-            <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--status-danger-bg); border: 1px solid var(--status-danger-border); color: var(--status-danger-text); padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 20px; font-size: 13px;">
-                <span style="font-size: 16px;">✕</span>
-                <div>
-                    @foreach($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
+        @if(session('error') || $errors->any())
+            <div class="m3-toast error">
+                <div class="m3-toast-icon">✕</div>
+                <div class="m3-toast-content">
+                    @if(session('error'))
+                        <div>{{ session('error') }}</div>
+                    @endif
+                    @if($errors->any())
+                        @foreach($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    @endif
                 </div>
+                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
             </div>
         @endif
+    </div>
 
-        @yield('content')
-    </main>
-
-    <footer class="site-footer">
-        <div class="site-footer-inner">
-            <p>&copy; 2026 Total Billing System. Financial Core & Payment Gateway.</p>
-            <p style="font-family: var(--font-mono); font-size: 11px;">Billing Console</p>
+    <!-- M3 Footer -->
+    <footer class="footer-fintech">
+        <div class="footer-fintech-inner">
+            <p>&copy; 2026 Total Billing System. Financial Core & Payment Gateway (Material Design 3 Expressive).</p>
+            <p style="font-family: var(--font-mono); font-size: 11.5px; color: var(--on-surface-variant);">Billing Core &bull; Enterprise Application Integration</p>
         </div>
     </footer>
+
+    <!-- Theme Switcher & Toast Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleBtn = document.getElementById('theme-toggle-btn');
+            var themeIcon = document.getElementById('theme-icon');
+
+            function updateThemeUI(theme) {
+                if (themeIcon) {
+                    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+                }
+            }
+
+            var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            updateThemeUI(currentTheme);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    var nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', nextTheme);
+                    document.documentElement.setAttribute('data-bs-theme', nextTheme);
+                    document.documentElement.style.colorScheme = nextTheme;
+                    localStorage.setItem('billing-theme', nextTheme);
+                    updateThemeUI(nextTheme);
+                });
+            }
+
+            // Auto dismiss toasts
+            var toasts = document.querySelectorAll('.m3-toast');
+            toasts.forEach(function(toast) {
+                setTimeout(function() {
+                    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(10px) scale(0.95)';
+                    setTimeout(function() { toast.remove(); }, 300);
+                }, 5000);
+            });
+        });
+    </script>
 
     @yield('scripts')
 </body>
