@@ -79,6 +79,9 @@
     --font-display: 'Google Sans Display', 'Google Sans', sans-serif;
     --font-mono: 'Google Sans Mono', 'JetBrains Mono', Consolas, monospace;
 
+    --sidebar-width: 264px;
+    --header-height: 60px;
+
     /* Concentric Corner Radii (Android 17 / BeerCSS) */
     --radius-xs: 8px;       /* Badges, tags */
     --radius-sm: 12px;      /* Inputs, sub-cards */
@@ -877,3 +880,289 @@ textarea:focus {
         text-align: center;
     }
 }
+
+/* === M3 EXPRESSIVE 264PX FIGMA DRAWER & TOP APP BAR LAYOUT === */
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--surface);
+    color: var(--on-surface);
+}
+
+/* Guest / No Sidebar Mode */
+.app-shell.no-sidebar .sidebar,
+body.no-sidebar .sidebar {
+    display: none !important;
+}
+.app-shell.no-sidebar .top-app-bar,
+body.no-sidebar .top-app-bar {
+    left: 0 !important;
+    width: 100% !important;
+}
+.app-shell.no-sidebar .main-content,
+body.no-sidebar .main-content {
+    margin-left: 0 !important;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--surface-container-low);
+    border-right: 1px solid var(--outline-variant);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1040;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-sizing: border-box;
+    transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), background-color 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Sidebar Top Brand Header (Figma M3 Style) */
+.m3-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 18px 16px 18px;
+    text-decoration: none !important;
+    color: inherit;
+    border-bottom: 1px solid var(--outline-variant);
+}
+
+.m3-cloud-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 14px;
+    background-color: var(--primary-container);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.m3-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.m3-brand-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--on-surface);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.m3-brand-subtitle {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--on-surface-variant);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Sidebar Menu Groups & Navigation Items */
+.menu-group {
+    padding: 6px 12px;
+}
+
+.menu-header {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--on-surface-variant);
+    padding: 6px 14px 4px 14px;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.menu-items-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 44px;
+    margin: 1px 0;
+    padding: 0 16px;
+    border-radius: var(--radius-pill) !important;
+    border-left: none !important;
+    color: var(--on-surface-variant);
+    text-decoration: none !important;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.15s cubic-bezier(0.2, 0, 0, 1), color 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.menu-item:hover {
+    background-color: var(--surface-container-high) !important;
+    color: var(--on-surface) !important;
+}
+
+.menu-item.active {
+    background-color: var(--secondary-container) !important;
+    color: var(--on-secondary-container) !important;
+    font-weight: 600;
+}
+
+.menu-icon-box {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.sidebar .menu-item:not(.active) .menu-icon-box i {
+    color: var(--on-surface-variant) !important;
+    opacity: 0.85;
+    transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.sidebar .menu-item:hover .menu-icon-box i {
+    color: var(--on-surface) !important;
+    opacity: 1;
+}
+
+.sidebar .menu-item.active .menu-icon-box i {
+    color: var(--on-secondary-container) !important;
+    opacity: 1;
+}
+
+.menu-label-text {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Sidebar Footer Info Card */
+.sidebar-footer-card {
+    margin-top: auto;
+    padding: 14px 16px;
+    border-top: 1px solid var(--outline-variant);
+    background: var(--surface-container-lowest);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* === TOP APP BAR (M3 FLAT ANDROID 17) === */
+.top-app-bar {
+    height: var(--header-height);
+    background: var(--surface);
+    border-bottom: 1px solid var(--outline-variant);
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1030;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    box-sizing: border-box;
+    transition: left 0.2s ease, width 0.2s ease, background-color 0.2s ease;
+}
+
+@media (min-width: 992px) {
+    .top-app-bar {
+        left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+    }
+}
+
+@media (max-width: 991.98px) {
+    .top-app-bar {
+        left: 0;
+        width: 100%;
+        padding: 0 16px;
+    }
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+    }
+    .sidebar.show {
+        transform: translateX(0);
+    }
+}
+
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1035;
+}
+
+.sidebar-backdrop.show {
+    display: block;
+}
+
+/* === MAIN CONTENT WRAPPER === */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.main-content {
+    box-sizing: border-box;
+    min-height: 100vh;
+    padding-top: calc(var(--header-height) + 24px);
+    padding-bottom: 48px;
+    transition: margin-left 0.2s ease;
+}
+
+@media (min-width: 992px) {
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .main-content {
+        margin-left: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+

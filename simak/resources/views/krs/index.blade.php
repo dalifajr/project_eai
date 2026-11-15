@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Pengisian Kartu Rencana Studi (KRS)')
+@section('page_title', 'Pengisian KRS')
+@section('page_subtitle', 'Penyusunan Rencana Studi Semester ' . $mahasiswa->semester_sekarang)
 
 @section('content')
 <!-- Page Header Info -->

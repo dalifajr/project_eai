@@ -1,182 +1,248 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="light" data-bs-theme="light">
+<html lang="id" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Portal Akademik') | SIMAK UNIVERSE</title>
-    
-    <!-- Instant Anti-FOUC Theme Initializer -->
-    <script>
-        (function() {
-            try {
-                var savedTheme = localStorage.getItem('simak-theme') || 
-                                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                document.documentElement.setAttribute('data-bs-theme', savedTheme);
-                document.documentElement.style.colorScheme = savedTheme;
-            } catch (e) {}
-        })();
-    </script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'SIMAK Universe') — Sistem Informasi Akademik</title>
 
-    <!-- Google Fonts Preconnect & M3 Material You Core CSS -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}">
-    
-    @yield('styles')
+    {{-- Google Sans Font & FontAwesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    {{-- M3 Expressive / Flat Material You Design System --}}
+    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}?v=2.1">
+
+    @stack('styles')
 </head>
 <body>
-    @auth
-    <!-- M3 Top App Bar -->
-    <header class="navbar">
-        <div class="navbar-container">
-            <a href="{{ route('dashboard') }}" class="navbar-brand">
-                <div class="brand-icon">S</div>
-                <div class="brand-meta">
-                    <div class="brand-title">
-                        SIMAK UNIVERSE
-                        <span class="m3-badge-pill primary" style="font-size: 10px; padding: 2px 8px;">EAI v2.0</span>
-                    </div>
-                    <div class="brand-subtitle">Portal Informasi Akademik Terintegrasi</div>
+    <div class="app-shell {{ !Auth::check() ? 'no-sidebar' : '' }}">
+        {{-- Mobile Backdrop --}}
+        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+        {{-- === SIDEBAR (264PX FIGMA NAVIGATION DRAWER) === --}}
+        <aside class="sidebar" id="sidebar">
+            {{-- Top Brand Header --}}
+            <a href="{{ route('dashboard') }}" class="m3-brand-header">
+                @include('partials.brand-logo')
+                <div class="m3-brand-text">
+                    <span class="m3-brand-title">SIMAK UNIVERSE</span>
+                    <span class="m3-brand-subtitle">Academic Core Portal</span>
                 </div>
             </a>
 
-            <!-- Navigation Pills -->
-            <nav class="nav-links">
-                <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    Dashboard
-                </a>
-                @if(Auth::user()->role === 'mahasiswa')
-                <a href="{{ route('krs.index') }}" class="nav-item {{ request()->routeIs('krs.*') ? 'active' : '' }}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    Pengisian KRS
-                </a>
-                <a href="{{ route('wisuda.index') }}" class="nav-item {{ request()->routeIs('wisuda.*') ? 'active' : '' }}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                    Pendaftaran Wisuda
-                </a>
-                @endif
-            </nav>
+            {{-- Navigation Menus --}}
+            <div style="flex: 1; overflow-y: auto; padding: 10px 0;">
+                @auth
+                    @if(Auth::user()->role === 'mahasiswa')
+                        {{-- MAHASISWA NAVIGATION --}}
+                        <div class="menu-group">
+                            <div class="menu-header">
+                                <i class="fas fa-compass"></i>
+                                <span>Menu Akademik</span>
+                            </div>
+                            <div class="menu-items-grid">
+                                <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-house"></i></div>
+                                    <span class="menu-label-text">Dashboard</span>
+                                </a>
+                                <a href="{{ route('profil.index') }}" class="menu-item {{ request()->routeIs('profil.*') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-id-card"></i></div>
+                                    <span class="menu-label-text">Profil Akademik</span>
+                                </a>
+                                <a href="{{ route('keuangan.index') }}" class="menu-item {{ request()->routeIs('keuangan.*') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-wallet"></i></div>
+                                    <span class="menu-label-text">Status UKT & VA</span>
+                                </a>
+                                <a href="{{ route('krs.index') }}" class="menu-item {{ request()->routeIs('krs.*') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-file-signature"></i></div>
+                                    <span class="menu-label-text">Pengisian KRS</span>
+                                </a>
+                                <a href="{{ route('wisuda.index') }}" class="menu-item {{ request()->routeIs('wisuda.*') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-graduation-cap"></i></div>
+                                    <span class="menu-label-text">Pendaftaran Wisuda</span>
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        {{-- ADMIN NAVIGATION --}}
+                        <div class="menu-group">
+                            <div class="menu-header">
+                                <i class="fas fa-shield-halved"></i>
+                                <span>Panel Administrator</span>
+                            </div>
+                            <div class="menu-items-grid">
+                                <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-chart-pie"></i></div>
+                                    <span class="menu-label-text">Dashboard Overview</span>
+                                </a>
+                                <a href="{{ route('admin.mahasiswa') }}" class="menu-item {{ request()->routeIs('admin.mahasiswa') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-users-gear"></i></div>
+                                    <span class="menu-label-text">Data Mahasiswa & Uji EAI</span>
+                                </a>
+                                <a href="{{ route('admin.matakuliah') }}" class="menu-item {{ request()->routeIs('admin.matakuliah') ? 'active' : '' }}">
+                                    <div class="menu-icon-box"><i class="fas fa-book-bookmark"></i></div>
+                                    <span class="menu-label-text">Katalog Mata Kuliah</span>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+                @endauth
+            </div>
 
-            <!-- Actions: Dark Mode Switcher & User Profile -->
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <!-- M3 Theme Switch Button -->
-                <button type="button" class="m3-theme-toggle" id="theme-toggle-btn" title="Ganti Tema (Terang/Gelap)">
-                    <span id="theme-icon">🌙</span>
-                </button>
-
-                <!-- User Profile Chip -->
-                <div style="display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 6px; border-radius: var(--radius-pill); background: var(--surface-container-low); border: 1px solid var(--outline-variant);">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </div>
-                    <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
-                        <span style="font-size: 12.5px; font-weight: 700; color: var(--on-surface);">{{ Auth::user()->name }}</span>
-                        <span style="font-size: 10.5px; color: var(--on-surface-variant); text-transform: capitalize;">{{ Auth::user()->role }} ({{ Auth::user()->username }})</span>
-                    </div>
+            {{-- Sidebar Footer Info --}}
+            <div class="sidebar-footer-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem;">
+                    <span style="font-weight: 600; color: var(--on-surface);">EAI Core Node</span>
+                    <span class="badge-m3 badge-m3-success" style="font-size: 0.65rem;">PORT 8000</span>
                 </div>
+                <div style="font-size: 0.7rem; color: var(--on-surface-variant); display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-link" style="color: var(--primary);"></i>
+                    <span>Terkoneksi ke Total Billing (8001)</span>
+                </div>
+            </div>
+        </aside>
 
-                <!-- Logout Button -->
-                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                    @csrf
-                    <button type="submit" class="btn-modern secondary sm" title="Keluar dari sesi ini">
-                        Keluar
+        {{-- === MAIN WRAPPER === --}}
+        <div class="main-wrapper">
+            {{-- Top App Bar --}}
+            <header class="top-app-bar">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    {{-- Hamburger for mobile --}}
+                    <button type="button" class="btn-m3-icon d-lg-none" onclick="toggleSidebar()" aria-label="Toggle Sidebar" style="border: 1px solid var(--outline-variant); background: var(--surface-container);">
+                        <i class="fas fa-bars"></i>
                     </button>
-                </form>
-            </div>
-        </div>
-    </header>
-    @endauth
 
-    <!-- Main Page Content -->
-    <main style="max-width: 1240px; margin: 0 auto; padding: 28px 24px 60px; width: 100%; flex: 1;">
-        @yield('content')
-    </main>
-
-    <!-- M3 Floating Toast Notification Container (Tanpa Background Abu-abu) -->
-    <div class="m3-toast-container" id="toast-container">
-        @if(session('success'))
-            <div class="m3-toast success">
-                <div class="m3-toast-icon">✓</div>
-                <div class="m3-toast-content">{{ session('success') }}</div>
-                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
-            </div>
-        @endif
-
-        @if(session('warning'))
-            <div class="m3-toast warning">
-                <div class="m3-toast-icon">!</div>
-                <div class="m3-toast-content">{{ session('warning') }}</div>
-                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
-            </div>
-        @endif
-
-        @if(session('error') || $errors->any())
-            <div class="m3-toast error">
-                <div class="m3-toast-icon">✕</div>
-                <div class="m3-toast-content">
-                    @if(session('error'))
-                        <div>{{ session('error') }}</div>
-                    @endif
-                    @if($errors->any())
-                        @foreach($errors->all() as $error)
-                            <div>{!! $error !!}</div>
-                        @endforeach
-                    @endif
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--on-surface); line-height: 1.2;">
+                            @yield('page_title', 'Dashboard')
+                        </span>
+                        <span style="font-size: 0.75rem; color: var(--on-surface-variant);">
+                            @yield('page_subtitle', 'Sistem Informasi Akademik')
+                        </span>
+                    </div>
                 </div>
-                <button type="button" class="m3-toast-close" onclick="this.parentElement.remove()">&times;</button>
-            </div>
-        @endif
+
+                {{-- Right Controls --}}
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    {{-- Theme Toggle --}}
+                    <button type="button" class="btn-m3-icon" id="themeToggleBtn" title="Toggle Tema (Light / Dark)">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+
+                    @auth
+                        {{-- User Chip --}}
+                        <div style="display: flex; align-items: center; gap: 10px; background: var(--surface-container-high); padding: 4px 12px 4px 6px; border-radius: var(--radius-pill); border: 1px solid var(--outline-variant);">
+                            <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+                            <div style="display: flex; flex-direction: column; line-height: 1.1;">
+                                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--on-surface); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{ Auth::user()->name }}
+                                </span>
+                                <span style="font-size: 0.6875rem; color: var(--on-surface-variant); text-transform: capitalize;">
+                                    {{ Auth::user()->role }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Logout --}}
+                        <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                            @csrf
+                            <button type="submit" class="btn-m3 btn-m3-outlined" style="height: 36px; padding: 0 14px; font-size: 0.8125rem; border-color: var(--outline-variant);" title="Keluar dari Akun">
+                                <i class="fas fa-right-from-bracket"></i>
+                                <span class="d-none d-sm-inline">Keluar</span>
+                            </button>
+                        </form>
+                    @endauth
+                </div>
+            </header>
+
+            {{-- Main Content Canvas --}}
+            <main class="main-content">
+                {{-- Flash Messages --}}
+                @if(session('success'))
+                    <div class="m3-alert m3-alert-success" style="margin-bottom: 20px;">
+                        <i class="fas fa-circle-check" style="font-size: 1.1rem;"></i>
+                        <div>{{ session('success') }}</div>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="m3-alert m3-alert-error" style="margin-bottom: 20px;">
+                        <i class="fas fa-triangle-exclamation" style="font-size: 1.1rem;"></i>
+                        <div>{{ session('error') }}</div>
+                    </div>
+                @endif
+
+                @if(session('info'))
+                    <div class="m3-alert m3-alert-info" style="margin-bottom: 20px;">
+                        <i class="fas fa-circle-info" style="font-size: 1.1rem;"></i>
+                        <div>{{ session('info') }}</div>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="m3-alert m3-alert-error" style="margin-bottom: 20px;">
+                        <i class="fas fa-triangle-exclamation" style="font-size: 1.1rem;"></i>
+                        <div>
+                            <strong>Terjadi Kesalahan:</strong>
+                            <ul style="margin: 4px 0 0 16px; padding: 0;">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                @endif
+
+                @yield('content')
+            </main>
+        </div>
     </div>
 
-    <!-- M3 Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <p>&copy; 2026 SIMAK UNIVERSE. Sistem Informasi Akademik Terpadu (Material Design 3 Expressive).</p>
-            <p style="font-family: var(--font-mono); font-size: 11.5px; color: var(--on-surface-variant);">SIMAK Portal &bull; Enterprise Application Integration</p>
-        </div>
-    </footer>
-
-    <!-- Theme Switcher & Toast Auto-dismiss Scripts -->
+    {{-- Interactive Theme & Drawer Scripts --}}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var toggleBtn = document.getElementById('theme-toggle-btn');
-            var themeIcon = document.getElementById('theme-icon');
-
-            function updateThemeUI(theme) {
-                if (themeIcon) {
-                    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-                }
+        // Sidebar Toggle for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (sidebar && backdrop) {
+                sidebar.classList.toggle('show');
+                backdrop.classList.toggle('show');
             }
+        }
 
-            var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            updateThemeUI(currentTheme);
+        // Theme Switcher (Light / Dark)
+        (function() {
+            const savedTheme = localStorage.getItem('simak_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
 
+            const toggleBtn = document.getElementById('themeToggleBtn');
             if (toggleBtn) {
-                toggleBtn.addEventListener('click', function() {
-                    var nextTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', nextTheme);
-                    document.documentElement.setAttribute('data-bs-theme', nextTheme);
-                    document.documentElement.style.colorScheme = nextTheme;
-                    localStorage.setItem('simak-theme', nextTheme);
-                    updateThemeUI(nextTheme);
+                toggleBtn.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('simak_theme', newTheme);
+                    updateThemeIcon(newTheme);
                 });
             }
 
-            // Auto dismiss toasts after 5 seconds
-            var toasts = document.querySelectorAll('.m3-toast');
-            toasts.forEach(function(toast) {
-                setTimeout(function() {
-                    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateY(10px) scale(0.95)';
-                    setTimeout(function() { toast.remove(); }, 300);
-                }, 5000);
-            });
-        });
+            function updateThemeIcon(theme) {
+                const icon = document.getElementById('themeIcon');
+                if (icon) {
+                    if (theme === 'dark') {
+                        icon.className = 'fas fa-sun';
+                        icon.style.color = '#ffdf9e';
+                    } else {
+                        icon.className = 'fas fa-moon';
+                        icon.style.color = 'inherit';
+                    }
+                }
+            }
+        })();
     </script>
-
-    @yield('scripts')
+    @stack('scripts')
 </body>
 </html>

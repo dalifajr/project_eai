@@ -12,6 +12,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Protected Dashboard & Operations
 Route::middleware('auth')->group(function () {
     Route::get('/', [BillingWebController::class, 'index'])->name('billing.dashboard');
+    Route::get('/simulator', [BillingWebController::class, 'simulator'])->name('billing.simulator');
+    Route::get('/invoices', [BillingWebController::class, 'invoices'])->name('billing.invoices');
+    Route::get('/webhook-logs', [BillingWebController::class, 'webhookLogs'])->name('billing.webhook_logs');
+
+    // Action POST Handlers
     Route::post('/simulasi-bayar', [BillingWebController::class, 'prosesSimulasiBayar'])->name('billing.simulasi_bayar');
     Route::post('/tagihan/{id}/update-status', [BillingWebController::class, 'updateStatusPelunasan'])->name('billing.update_status');
 });

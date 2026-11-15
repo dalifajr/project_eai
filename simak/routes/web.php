@@ -20,6 +20,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Mahasiswa Dedicated Menus
+    Route::get('/profil', [DashboardController::class, 'profil'])->name('profil.index');
+    Route::get('/keuangan', [DashboardController::class, 'keuangan'])->name('keuangan.index');
+
     // Pengisian KRS
     Route::get('/krs', [KrsController::class, 'index'])->name('krs.index');
     Route::post('/krs', [KrsController::class, 'store'])->name('krs.store');
@@ -29,4 +33,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wisuda', [WisudaController::class, 'index'])->name('wisuda.index');
     Route::post('/wisuda/data-lanjutan', [WisudaController::class, 'storeFormLanjutan'])->name('wisuda.data_lanjutan');
     Route::get('/wisuda/cetak', [WisudaController::class, 'cetak'])->name('wisuda.cetak');
+
+    // Admin Dedicated Menus
+    Route::get('/admin/mahasiswa', [DashboardController::class, 'adminMahasiswa'])->name('admin.mahasiswa');
+    Route::get('/admin/matakuliah', [DashboardController::class, 'adminMataKuliah'])->name('admin.matakuliah');
 });

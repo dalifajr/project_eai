@@ -1,218 +1,295 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard Mahasiswa')
+@section('page_title', 'Dashboard Akademik')
+@section('page_subtitle', 'Selamat datang di Portal SIMAK Universe')
 
 @section('content')
-<!-- M3 Hero Greeting Banner (28px Squircle Radius) -->
-<div class="m3-hero-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-    <div>
-        <span class="m3-badge-pill" style="background: rgba(255,255,255,0.25); color: currentColor; margin-bottom: 8px;">
-            PORTAL MAHASISWA &bull; EAI LIVE
-        </span>
-        <h1 style="font-size: 26px; font-weight: 700; color: inherit; letter-spacing: -0.02em;">
-            Selamat Datang, {{ $mahasiswa->nama }}
-        </h1>
-        <p style="font-size: 13.5px; opacity: 0.9; margin-top: 4px;">
-            Semester {{ $mahasiswa->semester_sekarang }} &bull; Tahun Akademik 2026/2027 &bull; Terintegrasi Realtime ke Total Billing System
-        </p>
-    </div>
-    <div>
-        <span class="m3-badge-pill {{ $mahasiswa->status_akademik === 'aktif' ? 'success' : 'danger' }}" style="padding: 8px 18px; font-size: 12.5px;">
-            Status: {{ strtoupper($mahasiswa->status_akademik) }}
-        </span>
-    </div>
-</div>
+<div style="display: flex; flex-direction: column; gap: 24px;">
 
-<div style="display: grid; grid-template-columns: 1.6fr 1.1fr; gap: 24px; align-items: start;">
-    <!-- Sisi Kiri: Profil & Status Integrasi Keuangan EAI -->
-    <div>
-        <!-- Modern Student Profile Card (16px Squircle dengan 12px Inner Blocks) -->
-        <div class="m3-card">
-            <div class="m3-card-header">
-                <div>
-                    <h2 class="m3-card-title">Identitas & Status Akademik</h2>
-                    <p class="m3-card-subtitle">Informasi pangkalan data pendidikan tinggi terverifikasi</p>
-                </div>
-                <span class="m3-badge-pill neutral" style="font-family: var(--font-mono);">NIM: {{ $mahasiswa->nim }}</span>
+    {{-- Welcome Hero Greeting --}}
+    <div class="m3-hero-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div style="max-width: 680px;">
+                <span class="badge-m3 badge-m3-neutral" style="margin-bottom: 8px;">
+                    <i class="fas fa-university me-1"></i> TAHUN AKADEMIK 2026/2027 GANJIL
+                </span>
+                <h1 style="font-family: var(--font-display); font-size: 1.55rem; font-weight: 700; margin: 4px 0 8px 0; color: var(--on-surface);">
+                    Halo, {{ $mahasiswa->nama }}! 👋
+                </h1>
+                <p style="margin: 0; color: var(--on-surface-variant); font-size: 0.9rem; line-height: 1.5;">
+                    {{ $mahasiswa->program_studi }} — {{ $mahasiswa->fakultas }}. Status Akademik saat ini adalah
+                    <strong style="color: var(--primary);">{{ strtoupper($mahasiswa->status_akademik) }}</strong>.
+                </p>
             </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ route('profil.index') }}" class="btn-m3 btn-m3-tonal">
+                    <i class="fas fa-id-card"></i>
+                    <span>Profil Lengkap</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
-                <div class="m3-inner-block">
-                    <span style="font-size: 11px; color: var(--on-surface-variant); font-weight: 600; text-transform: uppercase;">Program Studi</span>
-                    <div style="font-size: 14.5px; font-weight: 700; color: var(--on-surface); margin-top: 3px;">{{ $mahasiswa->program_studi }}</div>
+    {{-- Academic KPI Counters --}}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+        {{-- NIM & Semester --}}
+        <div class="m3-card" style="padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--on-surface-variant); text-transform: uppercase;">Identitas / NIM</span>
+                    <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 700; color: var(--on-surface); margin-top: 4px;">
+                        {{ $mahasiswa->nim }}
+                    </div>
                 </div>
-
-                <div class="m3-inner-block">
-                    <span style="font-size: 11px; color: var(--on-surface-variant); font-weight: 600; text-transform: uppercase;">Fakultas & Angkatan</span>
-                    <div style="font-size: 14.5px; font-weight: 700; color: var(--on-surface); margin-top: 3px;">{{ $mahasiswa->fakultas }} ({{ $mahasiswa->angkatan }})</div>
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--secondary-container); color: var(--on-secondary-container); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fas fa-fingerprint"></i>
                 </div>
-
-                <div class="m3-inner-block">
-                    <span style="font-size: 11px; color: var(--on-surface-variant); font-weight: 600; text-transform: uppercase;">Semester Berjalan</span>
-                    <div style="font-size: 14.5px; font-weight: 700; color: var(--on-surface); margin-top: 3px;">Semester {{ $mahasiswa->semester_sekarang }}</div>
-                </div>
-
-                <div class="m3-inner-block">
-                    <span style="font-size: 11px; color: var(--on-surface-variant); font-weight: 600; text-transform: uppercase;">Batas Beban SKS</span>
-                    <div style="font-size: 14.5px; font-weight: 700; color: var(--primary); margin-top: 3px;">{{ $mahasiswa->batas_sks }} SKS (IPS: {{ $mahasiswa->ips_lalu }})</div>
-                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--on-surface-variant);">
+                Semester Aktif: <strong>Semester {{ $mahasiswa->semester_sekarang }}</strong>
             </div>
         </div>
 
-        <!-- EAI Realtime Financial Integration Card -->
-        <div class="m3-card" style="border: 1px solid {{ $uktStatus['is_paid'] ? 'var(--tertiary)' : 'var(--warning)' }};">
-            <div class="m3-card-header" style="border-bottom-color: var(--outline-variant);">
+        {{-- IPS Terakhir --}}
+        <div class="m3-card" style="padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <span class="m3-badge-pill primary" style="font-size: 10px; margin-bottom: 4px;">EAI LIVE VALIDATION</span>
-                    <h2 class="m3-card-title">Status Tagihan UKT (Total Billing System)</h2>
-                    <p class="m3-card-subtitle">Sinkronisasi status tagihan kuliah via REST API EAI</p>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--on-surface-variant); text-transform: uppercase;">IPS Terakhir</span>
+                    <div style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-top: 4px;">
+                        {{ number_format($mahasiswa->ips_lalu, 2) }}
+                    </div>
                 </div>
-                @if($uktStatus['is_paid'])
-                    <span class="m3-badge-pill success">UKT SUDAH LUNAS</span>
-                @else
-                    <span class="m3-badge-pill danger">UKT BELUM LUNAS</span>
-                @endif
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--primary-container); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
             </div>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--on-surface-variant);">
+                Batas Beban SKS: <strong>{{ $mahasiswa->batas_sks }} SKS</strong>
+            </div>
+        </div>
 
-            @if($uktStatus['is_paid'])
-                <!-- KONDISI UKT LUNAS: M3 Tertiary Container -->
-                <div style="background: var(--tertiary-container); border: 1px solid transparent; border-radius: var(--radius-sm); padding: 20px;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                        <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--tertiary); color: var(--on-tertiary); display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700;">✓</span>
-                        <strong style="font-size: 15px; color: var(--on-tertiary-container);">Pembayaran UKT Semester {{ $mahasiswa->semester_sekarang }} Terverifikasi Sah</strong>
-                    </div>
-                    <p style="font-size: 13.5px; color: var(--on-tertiary-container); opacity: 0.9; margin-left: 40px;">
-                        Data pembayaran telah tersinkronisasi dari Total Billing System. Hak akses pengisian Kartu Rencana Studi (KRS) telah aktif.
-                    </p>
-
-                    <div style="margin: 14px 0 0 40px; font-size: 12.5px; color: var(--on-tertiary-container); display: flex; flex-wrap: wrap; gap: 16px;">
-                        <span>Invoice: <code style="background: rgba(0,0,0,0.06); border-radius: 4px; padding: 2px 6px;">{{ $uktStatus['data']['nomor_invoice'] ?? '-' }}</code></span>
-                        <span>Nominal: <strong>Rp {{ number_format($uktStatus['data']['nominal'] ?? 0, 0, ',', '.') }}</strong></span>
-                        <span>Waktu Bayar: <strong>{{ $uktStatus['data']['tanggal_bayar'] ?? '-' }}</strong></span>
-                    </div>
-
-                    <div style="margin-top: 18px; margin-left: 40px;">
-                        <a href="{{ route('krs.index') }}" class="btn-modern primary" style="font-size: 13px;">
-                            Buka Form Pengisian KRS &rarr;
-                        </a>
-                    </div>
-                </div>
-            @else
-                <!-- KONDISI UKT BELUM LUNAS: M3 Warning Container -->
-                <div style="background: var(--warning-container); border: 1px solid transparent; border-radius: var(--radius-sm); padding: 20px;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                        <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--warning); color: var(--on-warning); display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700;">!</span>
-                        <strong style="font-size: 15px; color: var(--on-warning-container);">Akses KRS Terkunci: Tagihan UKT Belum Dilunasi</strong>
-                    </div>
-                    <p style="font-size: 13.5px; color: var(--on-warning-container); opacity: 0.9; margin-left: 40px;">
-                        Validasi EAI mendeteksi tagihan UKT Semester {{ $mahasiswa->semester_sekarang }} belum dibayar. Sesuai aturan akademik, pengisian KRS tertutup sampai ada verifikasi pelunasan dari Total Billing System.
-                    </p>
-
-                    @if(isset($uktStatus['data']['nomor_va']))
-                    <div style="margin: 16px 0 0 40px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); padding: 18px; max-width: 480px;">
-                        <span style="font-size: 11px; font-weight: 600; color: var(--on-surface-variant); text-transform: uppercase;">Nomor Virtual Account Pembayaran:</span>
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
-                            <span id="va-number-text" style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--primary); letter-spacing: 0.04em;">
-                                {{ $uktStatus['data']['nomor_va'] }}
+        {{-- Status UKT Card --}}
+        <div class="m3-card" style="padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--on-surface-variant); text-transform: uppercase;">Status UKT (EAI)</span>
+                    <div style="margin-top: 6px;">
+                        @if(($uktStatus['status_pembayaran'] ?? 'UNPAID') === 'PAID')
+                            <span class="badge-m3 badge-m3-success" style="font-size: 0.85rem; padding: 4px 12px;">
+                                <i class="fas fa-circle-check me-1"></i> LUNAS
                             </span>
-                            <button type="button" onclick="navigator.clipboard.writeText('{{ $uktStatus['data']['nomor_va'] }}'); alert('Nomor VA berhasil disalin!');" class="btn-modern secondary sm" style="font-size: 12px;">
-                                Salin VA
-                            </button>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 13px; color: var(--on-surface); display: flex; justify-content: space-between; border-top: 1px dashed var(--outline-variant); padding-top: 8px;">
-                            <span>Nominal Tagihan:</span>
-                            <strong style="font-size: 14px;">Rp {{ number_format($uktStatus['data']['nominal'] ?? 0, 0, ',', '.') }}</strong>
-                        </div>
+                        @else
+                            <span class="badge-m3 badge-m3-error" style="font-size: 0.85rem; padding: 4px 12px;">
+                                <i class="fas fa-circle-exclamation me-1"></i> BELUM LUNAS
+                            </span>
+                        @endif
                     </div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--tertiary-container); color: var(--on-tertiary-container); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fas fa-receipt"></i>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--on-surface-variant);">
+                Rp {{ number_format($uktStatus['jumlah_tagihan'] ?? 5000000, 0, ',', '.') }}
+            </div>
+        </div>
+
+        {{-- Status KRS Card --}}
+        <div class="m3-card" style="padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--on-surface-variant); text-transform: uppercase;">Status KRS</span>
+                    <div style="margin-top: 6px;">
+                        @if($krsAktif)
+                            <span class="badge-m3 badge-m3-info" style="font-size: 0.85rem; padding: 4px 12px;">
+                                <i class="fas fa-check me-1"></i> {{ $krsAktif->total_sks }} SKS DIAMBIL
+                            </span>
+                        @else
+                            <span class="badge-m3 badge-m3-warning" style="font-size: 0.85rem; padding: 4px 12px;">
+                                <i class="fas fa-clock me-1"></i> BELUM MENGISI
+                            </span>
+                        @endif
+                    </div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--secondary-container); color: var(--on-secondary-container); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <i class="fas fa-book-open"></i>
+                </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--on-surface-variant);">
+                Semester {{ $mahasiswa->semester_sekarang }}
+            </div>
+        </div>
+    </div>
+
+    {{-- Feature Summary Cards (Divided into Clean Panels) --}}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+        
+        {{-- Panel 1: Status Keuangan & UKT Quick Access --}}
+        <div class="m3-card" style="display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--primary-container); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--on-surface);">Keuangan & UKT</h3>
+                        <small style="color: var(--on-surface-variant);">Integrasi Realtime EAI Billing</small>
+                    </div>
+                </div>
+                <a href="{{ route('keuangan.index') }}" class="btn-m3 btn-m3-tonal" style="font-size: 0.78rem; height: 34px; padding: 0 12px;">
+                    <span>Buka Menu</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div style="background: var(--surface-container); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Nomor Virtual Account:</span>
+                    <span style="font-family: var(--font-mono); font-weight: 700; color: var(--on-surface);">{{ $uktStatus['nomor_va'] ?? '88019'.$mahasiswa->nim }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Nominal Tagihan:</span>
+                    <strong style="color: var(--on-surface);">Rp {{ number_format($uktStatus['jumlah_tagihan'] ?? 5000000, 0, ',', '.') }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Status Validasi:</span>
+                    @if(($uktStatus['status_pembayaran'] ?? 'UNPAID') === 'PAID')
+                        <span class="badge-m3 badge-m3-success"><i class="fas fa-check-circle me-1"></i> LUNAS</span>
+                    @else
+                        <span class="badge-m3 badge-m3-error"><i class="fas fa-times-circle me-1"></i> MENUNGGU PEMBAYARAN</span>
                     @endif
+                </div>
+            </div>
 
-                    <div style="margin-top: 18px; margin-left: 40px; display: flex; gap: 10px; flex-wrap: wrap;">
-                        <a href="http://localhost:8001" target="_blank" class="btn-modern primary" style="font-size: 13px;">
-                            Buka Billing Simulator untuk Bayar &rarr;
-                        </a>
-                        <button onclick="location.reload()" class="btn-modern secondary sm" style="font-size: 12px;">
-                            Refresh Status Pembayaran
-                        </button>
+            <div style="margin-top: auto;">
+                @if(($uktStatus['status_pembayaran'] ?? 'UNPAID') !== 'PAID')
+                    <p style="font-size: 0.8rem; color: var(--on-surface-variant); margin-bottom: 12px;">
+                        <i class="fas fa-circle-info text-warning me-1"></i> Bayar tagihan via Simulator di Total Billing System (Port 8001) untuk membuka hak pengisian KRS.
+                    </p>
+                @endif
+                <a href="{{ route('keuangan.index') }}" class="btn-m3 btn-m3-primary" style="width: 100%;">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Rincian Pembayaran & Bukti</span>
+                </a>
+            </div>
+        </div>
+
+        {{-- Panel 2: Pengisian KRS Quick Access --}}
+        <div class="m3-card" style="display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--secondary-container); color: var(--on-secondary-container); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--on-surface);">Rencana Studi (KRS)</h3>
+                        <small style="color: var(--on-surface-variant);">Semester {{ $mahasiswa->semester_sekarang }}</small>
                     </div>
                 </div>
-            @endif
-        </div>
-    </div>
+                <a href="{{ route('krs.index') }}" class="btn-m3 btn-m3-tonal" style="font-size: 0.78rem; height: 34px; padding: 0 12px;">
+                    <span>Buka Menu</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
 
-    <!-- Sisi Kanan: Status KRS & Wisuda Widgets -->
-    <div>
-        <!-- KRS Status Widget (16px Card) -->
-        <div class="m3-card">
-            <div class="m3-card-header">
-                <div>
-                    <h3 class="m3-card-title">Status KRS Semester Ini</h3>
-                    <p class="m3-card-subtitle">Kartu Rencana Studi Semester {{ $mahasiswa->semester_sekarang }}</p>
-                </div>
+            <div style="background: var(--surface-container); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;">
+                @if($krsAktif && $krsAktif->details->count() > 0)
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Mata Kuliah Terpilih:</span>
+                        <strong style="color: var(--on-surface);">{{ $krsAktif->details->count() }} Mata Kuliah</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Total Beban SKS:</span>
+                        <span class="badge-m3 badge-m3-info">{{ $krsAktif->total_sks }} / {{ $mahasiswa->batas_sks }} SKS</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Status Pengajuan:</span>
+                        <span class="badge-m3 badge-m3-success"><i class="fas fa-check me-1"></i> Disetujui Dosen PA</span>
+                    </div>
+                @else
+                    <div style="text-align: center; padding: 12px 0;">
+                        <i class="fas fa-folder-open" style="font-size: 2rem; color: var(--outline-variant); margin-bottom: 8px;"></i>
+                        <p style="font-size: 0.85rem; color: var(--on-surface-variant); margin: 0;">
+                            Belum ada rencana studi tersimpan untuk semester ini.
+                        </p>
+                    </div>
+                @endif
+            </div>
+
+            <div style="margin-top: auto; display: flex; gap: 10px;">
+                <a href="{{ route('krs.index') }}" class="btn-m3 btn-m3-primary" style="flex: 1;">
+                    <i class="fas fa-pen-to-square"></i>
+                    <span>{{ $krsAktif ? 'Kelola KRS' : 'Isi KRS Sekarang' }}</span>
+                </a>
                 @if($krsAktif)
-                    <span class="m3-badge-pill success">DISETUJUI</span>
-                @else
-                    <span class="m3-badge-pill neutral">BELUM MENGISI</span>
-                @endif
-            </div>
-
-            @if($krsAktif)
-                <div class="m3-inner-block" style="margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 12px; color: var(--on-surface-variant);">Beban SKS Diambil:</span>
-                        <strong style="font-size: 15px; color: var(--primary);">{{ $krsAktif->total_sks }} / {{ $mahasiswa->batas_sks }} SKS</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--on-surface-variant);">
-                        <span>Jumlah Mata Kuliah:</span>
-                        <strong>{{ $krsAktif->details->count() }} MK</strong>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <a href="{{ route('krs.index') }}" class="btn-modern secondary" style="flex: 1; font-size: 12.5px;">Lihat Rincian KRS</a>
-                    <a href="{{ route('krs.cetak') }}" target="_blank" class="btn-modern primary" style="font-size: 12.5px;">Cetak Draft</a>
-                </div>
-            @else
-                <div style="text-align: center; padding: 18px 0; color: var(--on-surface-variant);">
-                    <p style="font-size: 13px;">Belum ada Kartu Rencana Studi tersimpan untuk semester ini.</p>
-                    <a href="{{ route('krs.index') }}" class="btn-modern secondary" style="margin-top: 14px; font-size: 12.5px;">
-                        Menuju Menu KRS &rarr;
+                    <a href="{{ route('krs.cetak') }}" target="_blank" class="btn-m3 btn-m3-tonal" title="Cetak KRS PDF">
+                        <i class="fas fa-print"></i>
                     </a>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
 
-        <!-- Wisuda Pipeline Widget (16px Card) -->
-        <div class="m3-card">
-            <div class="m3-card-header">
-                <div>
-                    <h3 class="m3-card-title">Pemeriksaan Wisuda</h3>
-                    <p class="m3-card-subtitle">Kesiapan kelulusan & bebas tanggungan</p>
+        {{-- Panel 3: Pendaftaran Wisuda Quick Access --}}
+        <div class="m3-card" style="display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--tertiary-container); color: var(--on-tertiary-container); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--on-surface);">Pendaftaran Wisuda</h3>
+                        <small style="color: var(--on-surface-variant);">Kelulusan & Webhook EAI</small>
+                    </div>
                 </div>
-                @if($mahasiswa->status_skripsi === 'lulus')
-                    <span class="m3-badge-pill success">SKRIPSI LULUS</span>
+                <a href="{{ route('wisuda.index') }}" class="btn-m3 btn-m3-tonal" style="font-size: 0.78rem; height: 34px; padding: 0 12px;">
+                    <span>Buka Menu</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div style="background: var(--surface-container); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px;">
+                @if($wisuda)
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.85rem; color: var(--on-surface-variant);">No. Pendaftaran:</span>
+                        <span style="font-family: var(--font-mono); font-weight: 600; color: var(--on-surface);">{{ $wisuda->nomor_pendaftaran }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Status Pendaftaran:</span>
+                        <span class="badge-m3 badge-m3-primary">{{ strtoupper($wisuda->status_pendaftaran) }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem; color: var(--on-surface-variant);">Status UKT Wisuda:</span>
+                        @if($wisuda->status_pembayaran_wisuda === 'PAID')
+                            <span class="badge-m3 badge-m3-success"><i class="fas fa-check-circle me-1"></i> PAID</span>
+                        @else
+                            <span class="badge-m3 badge-m3-warning"><i class="fas fa-clock me-1"></i> UNPAID</span>
+                        @endif
+                    </div>
                 @else
-                    <span class="m3-badge-pill neutral">{{ strtoupper($mahasiswa->status_skripsi) }}</span>
+                    <div style="text-align: center; padding: 12px 0;">
+                        <i class="fas fa-user-graduate" style="font-size: 2rem; color: var(--outline-variant); margin-bottom: 8px;"></i>
+                        <p style="font-size: 0.85rem; color: var(--on-surface-variant); margin: 0;">
+                            Pendaftaran Wisuda dibuka untuk mahasiswa semester akhir.
+                        </p>
+                    </div>
                 @endif
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; margin-bottom: 18px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface-container-low); border-radius: var(--radius-sm); border: 1px solid var(--outline-variant);">
-                    <span style="color: var(--on-surface-variant);">Sidang Skripsi:</span>
-                    <strong>{{ strtoupper($mahasiswa->status_skripsi) }}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface-container-low); border-radius: var(--radius-sm); border: 1px solid var(--outline-variant);">
-                    <span style="color: var(--on-surface-variant);">Bebas Lab:</span>
-                    <span>{!! $mahasiswa->bebas_lab ? '<span class="m3-badge-pill success">Bebas</span>' : '<span class="m3-badge-pill danger">Belum</span>' !!}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface-container-low); border-radius: var(--radius-sm); border: 1px solid var(--outline-variant);">
-                    <span style="color: var(--on-surface-variant);">Bebas Pustaka:</span>
-                    <span>{!! $mahasiswa->bebas_perpustakaan ? '<span class="m3-badge-pill success">Bebas</span>' : '<span class="m3-badge-pill danger">Belum</span>' !!}</span>
-                </div>
+            <div style="margin-top: auto; display: flex; gap: 10px;">
+                <a href="{{ route('wisuda.index') }}" class="btn-m3 btn-m3-primary" style="flex: 1;">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>{{ $wisuda ? 'Lihat Status Wisuda' : 'Daftar Wisuda' }}</span>
+                </a>
+                @if($wisuda && $wisuda->status_pembayaran_wisuda === 'PAID')
+                    <a href="{{ route('wisuda.cetak') }}" target="_blank" class="btn-m3 btn-m3-tonal" title="Cetak Bukti Wisuda">
+                        <i class="fas fa-print"></i>
+                    </a>
+                @endif
             </div>
-
-            <a href="{{ route('wisuda.index') }}" class="btn-modern secondary" style="width: 100%; font-size: 12.5px; justify-content: center;">
-                Pendaftaran & Cek Wisuda &rarr;
-            </a>
         </div>
+
     </div>
+
 </div>
 @endsection

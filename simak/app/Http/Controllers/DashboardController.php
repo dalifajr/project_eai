@@ -47,4 +47,49 @@ class DashboardController extends Controller
 
         return view('dashboard.mahasiswa', compact('mahasiswa', 'krsAktif', 'wisuda', 'uktStatus'));
     }
+
+    public function profil()
+    {
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('dashboard');
+        }
+
+        $mahasiswa = Mahasiswa::where('nim', $user->nim)->firstOrFail();
+        $krsCount = Krs::where('nim', $mahasiswa->nim)->count();
+        $wisuda = PendaftaranWisuda::where('nim', $mahasiswa->nim)->latest()->first();
+
+        return view('profil.index', compact('mahasiswa', 'krsCount', 'wisuda'));
+    }
+
+    public function keuangan()
+    {
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('dashboard');
+        }
+
+        $mahasiswa = Mahasiswa::where('nim', $user->nim)->firstOrFail();
+        $uktStatus = $this->billingService->getStatusUkt($mahasiswa->nim, $mahasiswa->semester_sekarang);
+
+        return view('keuangan.index', compact('mahasiswa', 'uktStatus'));
+    }
+
+    public function adminMahasiswa()
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+        $allMahasiswa = Mahasiswa::with('user', 'pendaftaranWisuda', 'krsList')->get();
+        return view('admin.mahasiswa', compact('allMahasiswa'));
+    }
+
+    public function adminMataKuliah()
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+        $mataKuliahList = MataKuliah::orderBy('semester')->orderBy('kode_mk')->get();
+        return view('admin.matakuliah', compact('mataKuliahList'));
+    }
 }

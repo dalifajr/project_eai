@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Pendaftaran Wisuda Sarjana')
+@section('page_title', 'Pendaftaran Wisuda')
+@section('page_subtitle', 'Verifikasi Prasyarat Akademik & Integrasi Pembayaran EAI')
 
 @section('content')
 <!-- Page Header Info -->

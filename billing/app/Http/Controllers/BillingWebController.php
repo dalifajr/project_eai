@@ -11,10 +11,56 @@ use Carbon\Carbon;
 
 class BillingWebController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Menu 1: Overview Finansial
+     */
+    public function index()
+    {
+        // Statistik Global
+        $totalNominalPaid = TagihanPembayaran::where('status_pembayaran', 'PAID')->sum('jumlah_tagihan');
+        $totalNominalUnpaid = TagihanPembayaran::where('status_pembayaran', 'UNPAID')->sum('jumlah_tagihan');
+        $totalTagihanCount = TagihanPembayaran::count();
+        $unpaidCount = TagihanPembayaran::where('status_pembayaran', 'UNPAID')->count();
+        $paidCount = TagihanPembayaran::where('status_pembayaran', 'PAID')->count();
+
+        // 5 Tagihan Terakhir
+        $recentInvoices = TagihanPembayaran::with('mahasiswa')->orderBy('created_at', 'desc')->take(5)->get();
+
+        // 5 Log Webhook Terakhir
+        $recentWebhooks = LogWebhookEvent::orderBy('created_at', 'desc')->take(5)->get();
+
+        return view('dashboard.index', compact(
+            'totalNominalPaid',
+            'totalNominalUnpaid',
+            'totalTagihanCount',
+            'unpaidCount',
+            'paidCount',
+            'recentInvoices',
+            'recentWebhooks'
+        ));
+    }
+
+    /**
+     * Menu 2: Simulator Gateway Bank & VA
+     */
+    public function simulator()
+    {
+        $unpaidInvoices = TagihanPembayaran::with('mahasiswa')
+            ->where('status_pembayaran', 'UNPAID')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('simulator.index', compact('unpaidInvoices'));
+    }
+
+    /**
+     * Menu 3: Manajemen Tagihan & Invoice
+     */
+    public function invoices(Request $request)
     {
         $filterStatus = $request->query('status', 'ALL');
         $filterJenis = $request->query('jenis', 'ALL');
+        $search = $request->query('q', '');
 
         $query = TagihanPembayaran::with('mahasiswa')->orderBy('created_at', 'desc');
 
@@ -26,35 +72,41 @@ class BillingWebController extends Controller
             $query->where('jenis_tagihan', $filterJenis);
         }
 
-        $tagihanList = $query->paginate(15);
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nomor_invoice', 'like', "%{$search}%")
+                  ->orWhere('nomor_va', 'like', "%{$search}%")
+                  ->orWhere('nim', 'like', "%{$search}%");
+            });
+        }
 
-        // Statistik
-        $totalNominalPaid = TagihanPembayaran::where('status_pembayaran', 'PAID')->sum('jumlah_tagihan');
-        $totalNominalUnpaid = TagihanPembayaran::where('status_pembayaran', 'UNPAID')->sum('jumlah_tagihan');
-        $totalTagihanCount = TagihanPembayaran::count();
-        $unpaidCount = TagihanPembayaran::where('status_pembayaran', 'UNPAID')->count();
+        $tagihanList = $query->paginate(15)->withQueryString();
 
-        // Tagihan yang siap disimulasikan pembayarannya
-        $unpaidInvoices = TagihanPembayaran::with('mahasiswa')
-            ->where('status_pembayaran', 'UNPAID')
-            ->get();
-
-        // Log Webhook 10 Terakhir
-        $webhookLogs = LogWebhookEvent::orderBy('created_at', 'desc')->take(10)->get();
-
-        return view('dashboard.index', compact(
-            'tagihanList',
-            'totalNominalPaid',
-            'totalNominalUnpaid',
-            'totalTagihanCount',
-            'unpaidCount',
-            'unpaidInvoices',
-            'webhookLogs',
-            'filterStatus',
-            'filterJenis'
-        ));
+        return view('invoices.index', compact('tagihanList', 'filterStatus', 'filterJenis', 'search'));
     }
 
+    /**
+     * Menu 4: Audit Log Webhook
+     */
+    public function webhookLogs(Request $request)
+    {
+        $search = $request->query('q', '');
+        $query = LogWebhookEvent::orderBy('created_at', 'desc');
+
+        if (!empty($search)) {
+            $query->where('event_name', 'like', "%{$search}%")
+                  ->orWhere('target_url', 'like', "%{$search}%")
+                  ->orWhere('payload', 'like', "%{$search}%");
+        }
+
+        $webhookLogs = $query->paginate(15)->withQueryString();
+
+        return view('webhook_logs.index', compact('webhookLogs', 'search'));
+    }
+
+    /**
+     * Proses Eksekusi Simulasi Pembayaran Bank
+     */
     public function prosesSimulasiBayar(Request $request)
     {
         $validated = $request->validate([
@@ -91,7 +143,7 @@ class BillingWebController extends Controller
             }
         }
 
-        return redirect()->route('billing.dashboard')->with('success', $pesan);
+        return back()->with('success', $pesan);
     }
 
     /**
@@ -141,7 +193,7 @@ class BillingWebController extends Controller
             }
         }
 
-        return redirect()->route('billing.dashboard')->with('success', $pesan);
+        return back()->with('success', $pesan);
     }
 
     /**

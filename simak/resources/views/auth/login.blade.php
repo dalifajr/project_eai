@@ -6,8 +6,8 @@
 <div style="max-width: 460px; margin: 40px auto;">
     <div class="m3-card" style="border-radius: var(--radius-xl); padding: 40px 36px; background: var(--surface-container-lowest);">
         <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 56px; height: 56px; background: var(--primary); color: var(--on-primary); font-weight: 700; font-size: 24px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-md); margin-bottom: 16px; font-family: var(--font-display);">
-                S
+            <div style="margin-bottom: 16px;">
+                @include('partials.brand-logo', ['style' => 'width: 56px; height: 56px; margin: 0 auto;'])
             </div>
             <h1 style="font-size: 24px; font-weight: 700; color: var(--on-surface); letter-spacing: -0.02em;">
                 SIMAK UNIVERSE
