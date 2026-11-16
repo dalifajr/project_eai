@@ -436,6 +436,8 @@ code, kbd, samp, pre {
 
 /* === M3 EXPRESSIVE BUTTONS === */
 .btn-fintech,
+.btn-modern,
+.btn-m3,
 .m3-btn {
     display: inline-flex;
     align-items: center;
@@ -448,55 +450,116 @@ code, kbd, samp, pre {
     border-radius: var(--radius-pill);
     border: none;
     cursor: pointer;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: all 0.2s var(--motion-easing-emphasized);
-    line-height: 1;
+    line-height: 1.2;
 }
 
 .btn-fintech:active,
+.btn-modern:active,
+.btn-m3:active,
 .m3-btn:active {
     transform: scale(0.98);
 }
 
 .btn-fintech.primary,
+.btn-modern.primary,
+.btn-m3.primary,
+.btn-m3-primary,
 .m3-btn-filled {
-    background: var(--primary);
-    color: var(--on-primary);
+    background: var(--primary) !important;
+    color: var(--on-primary) !important;
+    border: none !important;
 }
 
 .btn-fintech.primary:hover,
+.btn-modern.primary:hover,
+.btn-m3.primary:hover,
+.btn-m3-primary:hover,
 .m3-btn-filled:hover {
-    background: var(--brand-fintech-hover);
-    color: var(--on-primary);
+    background: var(--brand-fintech-hover, var(--primary)) !important;
+    color: var(--on-primary) !important;
+    filter: brightness(1.08);
 }
 
 .btn-fintech.secondary,
+.btn-modern.secondary,
+.btn-m3.secondary,
+.btn-m3-tonal,
 .m3-btn-tonal {
-    background: var(--secondary-container);
-    color: var(--on-secondary-container);
+    background: var(--secondary-container) !important;
+    color: var(--on-secondary-container) !important;
+    border: none !important;
 }
 
 .btn-fintech.secondary:hover,
+.btn-modern.secondary:hover,
+.btn-m3.secondary:hover,
+.btn-m3-tonal:hover,
 .m3-btn-tonal:hover {
-    background: var(--surface-container-high);
+    background: var(--surface-container-high) !important;
+    color: var(--on-surface) !important;
 }
 
 .btn-fintech.outlined,
+.btn-modern.outlined,
+.btn-m3.outlined,
+.btn-m3-outlined,
 .m3-btn-outlined {
-    background: transparent;
-    border: 1px solid var(--outline);
-    color: var(--primary);
+    background: transparent !important;
+    border: 1px solid var(--outline-variant) !important;
+    color: var(--primary) !important;
 }
 
-.btn-fintech.sm {
+.btn-fintech.outlined:hover,
+.btn-modern.outlined:hover,
+.btn-m3.outlined:hover,
+.btn-m3-outlined:hover,
+.m3-btn-outlined:hover {
+    background: var(--surface-container-high) !important;
+    border-color: var(--primary) !important;
+}
+
+.btn-fintech.text,
+.btn-m3-text,
+.m3-btn-text {
+    background: transparent !important;
+    color: var(--primary) !important;
+    padding: 10px 14px;
+}
+
+.btn-fintech.text:hover,
+.btn-m3-text:hover,
+.m3-btn-text:hover {
+    background: var(--active) !important;
+}
+
+.btn-fintech.sm,
+.btn-modern.sm,
+.btn-m3-sm,
+.m3-btn-sm {
     padding: 6px 14px;
     font-size: 12px;
     border-radius: var(--radius-pill);
 }
 
+.btn-fintech.danger,
+.btn-m3-danger {
+    background: var(--error) !important;
+    color: var(--on-error) !important;
+}
+
+.btn-fintech.success,
+.btn-m3-success {
+    background: var(--tertiary) !important;
+    color: var(--on-tertiary) !important;
+}
+
 /* === M3 STATUS PILL BADGES === */
 .pill-badge,
-.m3-badge-pill {
+.badge-pill,
+.m3-badge-pill,
+.badge-m3 {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -511,29 +574,117 @@ code, kbd, samp, pre {
     border: 1px solid transparent;
 }
 
+.pill-badge.primary,
+.badge-pill.brand,
+.m3-badge-pill.primary,
+.badge-m3.primary,
+.badge-m3-primary {
+    background: var(--primary-container) !important;
+    color: var(--on-primary-container) !important;
+    border-color: transparent !important;
+}
+
 .pill-badge.success,
-.m3-badge-pill.success {
-    background: var(--success-container);
-    color: var(--on-success-container);
+.badge-pill.success,
+.m3-badge-pill.success,
+.badge-m3.success,
+.badge-m3-success {
+    background: var(--tertiary-container, var(--success-container)) !important;
+    color: var(--on-tertiary-container, var(--on-success-container)) !important;
+    border-color: transparent !important;
 }
 
 .pill-badge.danger,
-.m3-badge-pill.danger {
-    background: var(--error-container);
-    color: var(--on-error-container);
+.badge-pill.danger,
+.m3-badge-pill.danger,
+.badge-m3.danger,
+.badge-m3-error,
+.badge-m3-danger {
+    background: var(--error-container) !important;
+    color: var(--on-error-container) !important;
+    border-color: transparent !important;
 }
 
 .pill-badge.warning,
-.m3-badge-pill.warning {
-    background: var(--warning-container);
-    color: var(--on-warning-container);
+.badge-pill.warning,
+.m3-badge-pill.warning,
+.badge-m3.warning,
+.badge-m3-warning {
+    background: var(--warning-container) !important;
+    color: var(--on-warning-container) !important;
+    border-color: transparent !important;
 }
 
 .pill-badge.neutral,
-.m3-badge-pill.neutral {
-    background: var(--surface-container);
-    color: var(--on-surface-variant);
+.badge-pill.neutral,
+.m3-badge-pill.neutral,
+.badge-m3.neutral,
+.badge-m3-neutral {
+    background: var(--surface-container) !important;
+    color: var(--on-surface-variant) !important;
+    border-color: var(--outline-variant) !important;
+}
+
+/* === M3 ALERT BANNERS === */
+.m3-alert {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.45;
+    border: 1px solid transparent;
+    animation: m3FadeIn 0.25s ease-out;
+}
+
+.m3-alert i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.m3-alert-success {
+    background: var(--tertiary-container, var(--success-container));
+    color: var(--on-tertiary-container, var(--on-success-container));
+    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.m3-alert-success i {
+    color: var(--primary);
+}
+
+.m3-alert-error,
+.m3-alert-danger {
+    background: var(--error-container);
+    color: var(--on-error-container);
+    border-color: color-mix(in srgb, var(--error) 35%, transparent);
+}
+
+.m3-alert-error i,
+.m3-alert-danger i {
+    color: var(--error);
+}
+
+.m3-alert-info {
+    background: var(--secondary-container);
+    color: var(--on-secondary-container);
     border-color: var(--outline-variant);
+}
+
+.m3-alert-info i {
+    color: var(--primary);
+}
+
+.m3-alert-warning {
+    background: var(--warning-container);
+    color: var(--on-warning-container);
+    border-color: color-mix(in srgb, var(--warning) 35%, transparent);
+}
+
+.m3-alert-warning i {
+    color: var(--on-warning-container);
 }
 
 /* === M3 DATA TABLES === */
@@ -1181,5 +1332,45 @@ textarea:focus {
     justify-content: center;
     font-weight: 700;
     font-size: 0.875rem;
+}
+
+/* === GUEST / NO-SIDEBAR MODE (Login & Full-Width Pages) === */
+.no-sidebar .navbar,
+body.no-sidebar .navbar,
+.app-container.no-sidebar .navbar {
+    left: 0 !important;
+    width: 100% !important;
+}
+
+.no-sidebar .sidebar,
+body.no-sidebar .sidebar,
+.app-container.no-sidebar .sidebar {
+    display: none !important;
+}
+
+.no-sidebar .main-content,
+body.no-sidebar .main-content,
+.app-container.no-sidebar .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+.auth-wrapper {
+    min-height: calc(100vh - var(--total-header-height) - 40px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    box-sizing: border-box;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    border-radius: var(--radius-xl);
+    padding: 36px 32px;
+    background: var(--surface-container-lowest);
+    border: 1px solid var(--outline-variant);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 

@@ -174,7 +174,7 @@
         <div class="m3-card" style="display: flex; flex-direction: column;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--on-surface); display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-tower-broadcast text-primary"></i>
+                    <i class="fas fa-satellite-dish text-primary"></i>
                     <span>Aktivitas Webhook Terkini</span>
                 </h3>
                 <a href="{{ route('billing.webhook_logs') }}" class="btn-m3 btn-m3-tonal" style="font-size: 0.78rem; height: 32px; padding: 0 10px;">

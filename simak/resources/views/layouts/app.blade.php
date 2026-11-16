@@ -1,3 +1,8 @@
+@php
+    $isAuthenticated = Auth::check();
+    $hideSidebar = !$isAuthenticated;
+    $isLoginPage = request()->routeIs('login*');
+@endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}" data-bs-theme="light">
 <head>
@@ -13,35 +18,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     {{-- M3 Expressive / Flat Material You Design System --}}
-    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}?v=2.2">
+    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}?v=2.3">
 
     @stack('styles')
 </head>
-<body>
+<body class="{{ $hideSidebar ? 'no-sidebar' : '' }}">
     {{-- Top App Bar / Navbar (M3 Flat Material You) --}}
     <nav class="navbar navbar-expand fixed-top px-3 px-md-4 pcc-platform-bar" style="z-index: 1030;">
-        {{-- Mobile Brand & Sidebar Toggle (< 992px) --}}
-        <div class="d-flex align-items-center gap-2 d-lg-none">
-            <button type="button" class="btn btn-link link-body-emphasis m3-icon-btn p-0" id="sidebarToggle" aria-label="Buka Menu" style="width: 36px; height: 36px;">
-                <i class="fas fa-bars" style="font-size: 1.1rem;"></i>
-            </button>
-            <a href="{{ route('dashboard') }}" class="navbar-brand d-flex align-items-center gap-2 m-0 text-decoration-none" style="font-size: 0.95rem;">
-                @include('partials.brand-logo', ['style' => 'width: 32px; height: 32px;'])
-                <span class="fw-bold" style="color: var(--on-surface); letter-spacing: -0.01em;">
-                    SIMAK UNIVERSE
-                </span>
-            </a>
-        </div>
+        @if(!$hideSidebar)
+            {{-- Mobile Brand & Sidebar Toggle (< 992px) Saat Login --}}
+            <div class="d-flex align-items-center gap-2 d-lg-none">
+                <button type="button" class="btn btn-link link-body-emphasis m3-icon-btn p-0" id="sidebarToggle" aria-label="Buka Menu" style="width: 36px; height: 36px;">
+                    <i class="fas fa-bars" style="font-size: 1.1rem;"></i>
+                </button>
+                <a href="{{ route('dashboard') }}" class="navbar-brand d-flex align-items-center gap-2 m-0 text-decoration-none" style="font-size: 0.95rem;">
+                    @include('partials.brand-logo', ['style' => 'width: 32px; height: 32px;'])
+                    <span class="fw-bold" style="color: var(--on-surface); letter-spacing: -0.01em;">
+                        SIMAK UNIVERSE
+                    </span>
+                </a>
+            </div>
 
-        {{-- Desktop Page Title & Subtitle (>= 992px) --}}
-        <div class="d-none d-lg-flex flex-column" style="line-height: 1.2;">
-            <span style="font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--on-surface);">
-                @yield('page_title', 'Dashboard')
-            </span>
-            <span style="font-size: 0.75rem; color: var(--on-surface-variant);">
-                @yield('page_subtitle', 'Sistem Informasi Akademik')
-            </span>
-        </div>
+            {{-- Desktop Page Title & Subtitle (>= 992px) --}}
+            <div class="d-none d-lg-flex flex-column" style="line-height: 1.2;">
+                <span style="font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--on-surface);">
+                    @yield('page_title', 'Dashboard')
+                </span>
+                <span style="font-size: 0.75rem; color: var(--on-surface-variant);">
+                    @yield('page_subtitle', 'Sistem Informasi Akademik')
+                </span>
+            </div>
+        @else
+            {{-- Guest / Pre-Login Brand Header --}}
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center gap-2.5 m-0 text-decoration-none">
+                    @include('partials.brand-logo', ['style' => 'width: 34px; height: 34px;'])
+                    <div class="d-flex flex-column text-start" style="line-height: 1.15;">
+                        <span class="fw-bold" style="color: var(--on-surface); font-size: 0.95rem; letter-spacing: -0.01em;">
+                            SIMAK UNIVERSE
+                        </span>
+                        <span style="font-size: 0.7rem; color: var(--on-surface-variant); font-weight: 500;">
+                            Academic Core Portal
+                        </span>
+                    </div>
+                </a>
+            </div>
+        @endif
 
         {{-- Right Controls --}}
         <div class="ms-auto d-flex align-items-center gap-2">
@@ -95,15 +117,18 @@
                 </ul>
             </div>
             @else
-            <a href="{{ route('login') }}" class="btn btn-sm btn-primary rounded-pill px-3 d-flex align-items-center gap-1.5 ms-1">
-                <i class="fas fa-sign-in-alt"></i> <span>Masuk</span>
-            </a>
+                @if(!$isLoginPage)
+                <a href="{{ route('login') }}" class="btn btn-sm btn-primary rounded-pill px-3 d-flex align-items-center gap-1.5 ms-1">
+                    <i class="fas fa-sign-in-alt"></i> <span>Masuk</span>
+                </a>
+                @endif
             @endauth
         </div>
     </nav>
 
     {{-- App Container --}}
-    <div class="app-container">
+    <div class="app-container {{ $hideSidebar ? 'no-sidebar' : '' }}">
+        @if(!$hideSidebar)
         {{-- Sidebar (Desktop Drawer / Mobile Bottom Sheet) --}}
         <div id="sidebar" class="sidebar">
             {{-- Mobile Bottom Sheet Grab Handle & Header (< 992px) --}}
@@ -230,42 +255,43 @@
                     </a>
                 </div>
                 <div class="d-flex align-items-center justify-content-between px-2 pt-2" style="font-size: 0.72rem; color: var(--on-surface-variant);">
-                    <span>Core Node v2.2</span>
+                    <span>Core Node v2.3</span>
                     <span class="badge rounded-pill" style="background: var(--tertiary-container); color: var(--on-tertiary-container); font-size: 0.68rem; font-weight: 600;">PORT 8000</span>
                 </div>
             </div>
         </div>
+        @endif
 
         {{-- Main Content Canvas --}}
         <main class="main-content position-relative">
             <div class="main-background"></div>
 
-            <div class="container-fluid position-relative px-4 pb-4 pt-4">
+            <div class="{{ $hideSidebar ? 'p-0' : 'container-fluid position-relative px-4 pb-4 pt-4' }}">
                 {{-- Flash Messages --}}
                 @if(session('success'))
-                    <div class="m3-alert m3-alert-success mb-3">
-                        <i class="fas fa-circle-check" style="font-size: 1.1rem;"></i>
+                    <div class="m3-alert m3-alert-success mb-3 {{ $hideSidebar ? 'm-3' : '' }}">
+                        <i class="fas fa-circle-check"></i>
                         <div>{{ session('success') }}</div>
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="m3-alert m3-alert-error mb-3">
-                        <i class="fas fa-triangle-exclamation" style="font-size: 1.1rem;"></i>
+                    <div class="m3-alert m3-alert-error mb-3 {{ $hideSidebar ? 'm-3' : '' }}">
+                        <i class="fas fa-triangle-exclamation"></i>
                         <div>{{ session('error') }}</div>
                     </div>
                 @endif
 
                 @if(session('info'))
-                    <div class="m3-alert m3-alert-info mb-3">
-                        <i class="fas fa-circle-info" style="font-size: 1.1rem;"></i>
+                    <div class="m3-alert m3-alert-info mb-3 {{ $hideSidebar ? 'm-3' : '' }}">
+                        <i class="fas fa-circle-info"></i>
                         <div>{{ session('info') }}</div>
                     </div>
                 @endif
 
                 @if($errors->any())
-                    <div class="m3-alert m3-alert-error mb-3">
-                        <i class="fas fa-triangle-exclamation" style="font-size: 1.1rem;"></i>
+                    <div class="m3-alert m3-alert-error mb-3 {{ $hideSidebar ? 'm-3' : '' }}">
+                        <i class="fas fa-triangle-exclamation"></i>
                         <div>
                             <strong>Terjadi Kesalahan:</strong>
                             <ul style="margin: 4px 0 0 16px; padding: 0;">
@@ -281,15 +307,17 @@
             </div>
         </main>
 
+        @if(!$hideSidebar)
         {{-- Sidebar Mobile Overlay --}}
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        @endif
     </div>
 
     {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     {{-- Application JS (Theme Toggle & M3 Sidebar / Mobile Bottom Sheet gestures) --}}
-    <script src="{{ asset('js/app.js') }}?v=2.2"></script>
+    <script src="{{ asset('js/app.js') }}?v=2.3"></script>
 
     @stack('scripts')
 </body>
