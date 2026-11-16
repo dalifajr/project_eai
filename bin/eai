@@ -24,16 +24,6 @@ SIMAK_PATH="${SIMAK_PATH:-/var/www/simak}"
 BILLING_PATH="${BILLING_PATH:-/var/www/billing}"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/eai}"
 
-# Auto-deteksi direktori clone Git repositori jika REPO_DIR belum disetel
-if [ -z "$REPO_DIR" ]; then
-    for candidate in "$HOME/PROJECT EAI" "$HOME/eai" "$HOME/eai_project" "/root/PROJECT EAI" "/root/eai" "/root/eai_project" "/var/www/eai" "$(dirname "$(dirname "$(readlink -f "$0" 2>/dev/null || echo "")")")"; do
-        if [ -d "$candidate/.git" ] && [ -d "$candidate/simak" ] && [ -d "$candidate/billing" ]; then
-            REPO_DIR="$candidate"
-            break
-        fi
-    done
-fi
-
 # Deteksi Versi PHP-FPM Aktif
 PHP_SERVICE=$(systemctl list-units --type=service --state=running | grep -oE "php[0-9.]+-fpm" | head -n 1)
 if [ -z "$PHP_SERVICE" ]; then
@@ -144,55 +134,114 @@ cmd_reload() {
 
 # Fungsi: Update Kode & Dependensi
 cmd_update() {
+    local custom_repo="$1"
     print_header
     echo -e "${BOLD}${YELLOW}=== MEMULAI PEMBARUAN APLIKASI (SIMAK & BILLING) ===${NC}\n"
 
-    # 1. Update dari Repositori Git Utama jika ada
-    if [ -n "$REPO_DIR" ] && [ -d "$REPO_DIR/.git" ]; then
-        echo -e "${CYAN}--> Menarik pembaruan dari Git Repositori (${REPO_DIR})...${NC}"
-        cd "$REPO_DIR"
-        git pull || echo -e "${YELLOW}Catatan: Git pull repositori utama dilewati / tidak ada remote.${NC}"
+    # 0. Eliminasi Masalah Git Dubious Ownership di Linux
+    git config --global --add safe.directory "*" 2>/dev/null || true
 
-        echo -e "${CYAN}--> Menyinkronkan file proyek ke direktori server...${NC}"
-        if command -v rsync &> /dev/null; then
-            rsync -av --exclude='.env' --exclude='storage/' --exclude='vendor/' "$REPO_DIR/simak/" "$SIMAK_PATH/"
-            rsync -av --exclude='.env' --exclude='storage/' --exclude='vendor/' "$REPO_DIR/billing/" "$BILLING_PATH/"
-        else
-            cp -r "$REPO_DIR/simak/resources" "$SIMAK_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/simak/public" "$SIMAK_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/simak/app" "$SIMAK_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/simak/routes" "$SIMAK_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/simak/database" "$SIMAK_PATH/" 2>/dev/null || true
-
-            cp -r "$REPO_DIR/billing/resources" "$BILLING_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/billing/public" "$BILLING_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/billing/app" "$BILLING_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/billing/routes" "$BILLING_PATH/" 2>/dev/null || true
-            cp -r "$REPO_DIR/billing/database" "$BILLING_PATH/" 2>/dev/null || true
-        fi
-
-        if [ -f "$REPO_DIR/bin/eai" ]; then
-            cp "$REPO_DIR/bin/eai" /usr/local/bin/eai 2>/dev/null || true
-            chmod +x /usr/local/bin/eai 2>/dev/null || true
-        fi
-        echo -e "${GREEN}✓ Sinkronisasi berkas terbaru selesai.${NC}\n"
+    # 1. Cari atau Validasi REPO_DIR
+    if [ -n "$custom_repo" ] && [ -d "$custom_repo/.git" ]; then
+        REPO_DIR="$custom_repo"
     fi
 
-    # 2. Update SIMAK
+    if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR/.git" ]; then
+        for candidate in \
+            "$(pwd)" \
+            "$HOME/PROJECT EAI" "$HOME/PROJECT-EAI" "$HOME/eai" "$HOME/eai_project" \
+            "/root/PROJECT EAI" "/root/PROJECT-EAI" "/root/eai" "/root/eai_project" \
+            "/var/www/eai" "/var/www/project" \
+            /home/*/"PROJECT EAI" /home/*/"PROJECT-EAI" /home/*/"eai" \
+            "$(dirname "$(dirname "$(readlink -f "$0" 2>/dev/null || echo "")")")"; do
+            if [ -d "$candidate/.git" ] && [ -d "$candidate/simak" ] && [ -d "$candidate/billing" ]; then
+                REPO_DIR="$candidate"
+                break
+            fi
+        done
+    fi
+
+    if [ -n "$REPO_DIR" ] && [ -d "$REPO_DIR/.git" ]; then
+        echo -e "${CYAN}--> Repositori Git terdeteksi di: ${BOLD}${REPO_DIR}${NC}"
+        cd "$REPO_DIR"
+
+        # Simpan path ini ke /etc/eai/config agar permanen untuk eksekusi berikutnya
+        mkdir -p /etc/eai
+        cat > /etc/eai/config <<EOF
+REPO_DIR="${REPO_DIR}"
+SIMAK_PATH="${SIMAK_PATH}"
+BILLING_PATH="${BILLING_PATH}"
+PHP_SERVICE="${PHP_SERVICE}"
+EOF
+
+        # Pastikan paket rsync terpasang
+        if ! command -v rsync &> /dev/null; then
+            echo -e "${YELLOW}Menginstal paket rsync untuk sinkronisasi berkas...${NC}"
+            apt-get update -y >/dev/null 2>&1 && apt-get install -y rsync >/dev/null 2>&1 || true
+        fi
+
+        echo -e "${CYAN}--> Git Commit sebelum update: ${BOLD}$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')${NC}"
+        echo -e "${CYAN}--> Menarik pembaruan dari remote Git...${NC}"
+        git pull origin main || git pull || echo -e "${YELLOW}Catatan: Git pull dilewati / tidak ada remote.${NC}"
+        echo -e "${GREEN}--> Git Commit setelah update : ${BOLD}$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')${NC}\n"
+
+        echo -e "${CYAN}--> Menyinkronkan berkas aplikasi ke direktori server web...${NC}"
+        if command -v rsync &> /dev/null; then
+            rsync -av --delete-after \
+                --exclude='.env' \
+                --exclude='storage/' \
+                --exclude='bootstrap/cache/' \
+                --exclude='vendor/' \
+                --exclude='.git/' \
+                "$REPO_DIR/simak/" "$SIMAK_PATH/"
+
+            rsync -av --delete-after \
+                --exclude='.env' \
+                --exclude='storage/' \
+                --exclude='bootstrap/cache/' \
+                --exclude='vendor/' \
+                --exclude='.git/' \
+                "$REPO_DIR/billing/" "$BILLING_PATH/"
+        else
+            cp -r "$REPO_DIR/simak/resources/." "$SIMAK_PATH/resources/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/public/." "$SIMAK_PATH/public/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/app/." "$SIMAK_PATH/app/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/routes/." "$SIMAK_PATH/routes/" 2>/dev/null || true
+            cp -r "$REPO_DIR/simak/database/." "$SIMAK_PATH/database/" 2>/dev/null || true
+
+            cp -r "$REPO_DIR/billing/resources/." "$BILLING_PATH/resources/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/public/." "$BILLING_PATH/public/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/app/." "$BILLING_PATH/app/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/routes/." "$BILLING_PATH/routes/" 2>/dev/null || true
+            cp -r "$REPO_DIR/billing/database/." "$BILLING_PATH/database/" 2>/dev/null || true
+        fi
+
+        # Self-update binary CLI /usr/local/bin/eai
+        if [ -f "$REPO_DIR/bin/eai" ]; then
+            cp "$REPO_DIR/bin/eai" /usr/local/bin/eai
+            chmod +x /usr/local/bin/eai
+            echo -e "${GREEN}✓ Command CLI /usr/local/bin/eai telah diperbarui ke versi mutakhir.${NC}"
+        fi
+        echo -e "${GREEN}✓ Sinkronisasi berkas sumber terbaru selesai.${NC}\n"
+    else
+        echo -e "${YELLOW}[PERINGATAN] Folder git clone tidak terdeteksi otomatis.${NC}"
+        echo -e "${YELLOW}Jika Anda tahu lokasi folder clone proyek, jalankan:${NC}"
+        echo -e "  ${BOLD}eai update /path/ke/folder_project${NC}\n"
+    fi
+
+    # 2. Update SIMAK Portal
     if [ -d "$SIMAK_PATH" ]; then
         echo -e "${CYAN}--> Memproses dependensi & cache SIMAK Portal (${SIMAK_PATH})...${NC}"
         cd "$SIMAK_PATH"
         if [ -d ".git" ]; then
-            echo "Menarik update git langsung di folder simak..."
             git pull || echo -e "${YELLOW}Catatan: Git pull lokal dilewati.${NC}"
         fi
         if command -v composer &> /dev/null; then
-            echo "Menginstal dependensi Composer..."
             composer install --no-dev --optimize-autoloader --no-interaction
         fi
-        echo "Menjalankan migrasi database..."
+        echo "Menjalankan migrasi database SIMAK..."
         php artisan migrate --force
-        echo "Membersihkan dan mengoptimalkan cache produksi..."
+        echo "Membersihkan dan membangun ulang cache produksi SIMAK..."
         php artisan optimize:clear
         php artisan config:cache
         php artisan route:cache
@@ -202,21 +251,19 @@ cmd_update() {
         echo -e "${GREEN}✓ SIMAK Portal berhasil diperbarui.${NC}\n"
     fi
 
-    # 3. Update Billing
+    # 3. Update Total Billing System
     if [ -d "$BILLING_PATH" ]; then
         echo -e "${CYAN}--> Memproses dependensi & cache Total Billing System (${BILLING_PATH})...${NC}"
         cd "$BILLING_PATH"
         if [ -d ".git" ]; then
-            echo "Menarik update git langsung di folder billing..."
             git pull || echo -e "${YELLOW}Catatan: Git pull lokal dilewati.${NC}"
         fi
         if command -v composer &> /dev/null; then
-            echo "Menginstal dependensi Composer..."
             composer install --no-dev --optimize-autoloader --no-interaction
         fi
-        echo "Menjalankan migrasi database..."
+        echo "Menjalankan migrasi database Billing..."
         php artisan migrate --force
-        echo "Membersihkan dan mengoptimalkan cache produksi..."
+        echo "Membersihkan dan membangun ulang cache produksi Billing..."
         php artisan optimize:clear
         php artisan config:cache
         php artisan route:cache
@@ -391,7 +438,7 @@ cmd_help() {
     echo -e "  ${GREEN}status${NC}                  Melihat status layanan Nginx, PHP, MySQL & direktori"
     echo -e "  ${GREEN}restart [target]${NC}        Merestart layanan. Target: all (default), nginx, php, mysql"
     echo -e "  ${GREEN}reload${NC}                  Reload Nginx & PHP-FPM tanpa downtime"
-    echo -e "  ${GREEN}update${NC}                  Tarik git update, install composer, migrate, dan cache"
+    echo -e "  ${GREEN}update [repo_dir]${NC}       Tarik git update, sync berkas, migrate & cache"
     echo -e "  ${GREEN}migrate [target]${NC}        Menjalankan migrasi database. Target: all, simak, billing"
     echo -e "  ${GREEN}seed [target]${NC}           Menjalankan database seeder. Target: all, simak, billing"
     echo -e "  ${GREEN}cache:clear${NC}             Membersihkan seluruh cache aplikasi"
@@ -403,6 +450,7 @@ cmd_help() {
     echo -e "${BOLD}CONTOH PENGGUNAAN:${NC}"
     echo -e "  eai status"
     echo -e "  eai update"
+    echo -e "  eai update /root/PROJECT\\ EAI"
     echo -e "  eai restart nginx"
     echo -e "  eai logs simak"
     echo -e "  eai backup\n"
@@ -420,7 +468,7 @@ case "${1:-help}" in
         cmd_reload
         ;;
     update)
-        cmd_update
+        cmd_update "$2"
         ;;
     migrate)
         cmd_migrate "$2"

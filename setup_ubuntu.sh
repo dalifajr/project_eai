@@ -117,7 +117,7 @@ rm -f /etc/apt/sources.list.d/*ondrej* 2>/dev/null || true
 apt-get clean
 
 apt-get update -y
-apt-get install -y software-properties-common curl git unzip ufw ca-certificates lsb-release
+apt-get install -y software-properties-common curl git unzip ufw ca-certificates lsb-release rsync
 
 # Kebijakan PHP Repository:
 # Pada Ubuntu 26 (resolute), repositori resmi Ubuntu telah menyediakan PHP terbaru langsung.
