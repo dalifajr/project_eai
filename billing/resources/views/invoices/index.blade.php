@@ -74,110 +74,112 @@
     </div>
 
     {{-- Invoices Table Card --}}
-    <div class="m3-card" style="padding: 0; overflow: hidden;">
-        <div class="table-container-modern">
-            <table class="table-m3">
-                <thead>
-                    <tr>
-                        <th style="width: 80px;">Jenis</th>
-                        <th>Nomor Invoice</th>
-                        <th>Mahasiswa</th>
-                        <th>Nomor Virtual Account</th>
-                        <th>Nominal Tagihan</th>
-                        <th>Waktu & Kanal Bayar</th>
-                        <th style="text-align: center;">Status</th>
-                        <th style="text-align: right;">Kelola Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($tagihanList as $tagihan)
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+        <div class="card-body p-0">
+            <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <td>
-                                <span class="badge-m3 {{ $tagihan->jenis_tagihan === 'WISUDA' ? 'badge-m3-primary' : 'badge-m3-neutral' }}" style="font-weight: 700; font-size: 0.7rem;">
-                                    {{ $tagihan->jenis_tagihan }}
-                                </span>
-                            </td>
-                            <td>
-                                <strong style="font-family: var(--font-mono); color: var(--on-surface); font-size: 0.85rem;">{{ $tagihan->nomor_invoice }}</strong>
-                                <div style="font-size: 0.7rem; color: var(--on-surface-variant);">
-                                    Terbit: {{ $tagihan->created_at->format('d/m/Y H:i') }}
-                                </div>
-                            </td>
-                            <td>
-                                <div style="font-weight: 600; color: var(--on-surface); font-size: 0.875rem;">
-                                    {{ $tagihan->mahasiswa->nama ?? 'Mahasiswa' }}
-                                </div>
-                                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--on-surface-variant);">
-                                    NIM: {{ $tagihan->nim }}
-                                </div>
-                            </td>
-                            <td>
-                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary); font-size: 0.9rem;">
-                                    {{ $tagihan->nomor_va }}
-                                </span>
-                            </td>
-                            <td>
-                                <strong style="color: var(--on-surface); font-size: 0.9rem;">
-                                    Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}
-                                </strong>
-                            </td>
-                            <td>
-                                @if($tagihan->tanggal_bayar)
-                                    <div style="font-size: 0.8rem; color: var(--on-surface);">
-                                        {{ $tagihan->tanggal_bayar->format('d/m/Y H:i') }}
+                            <th class="ps-4" style="width: 80px;">Jenis</th>
+                            <th>Nomor Invoice</th>
+                            <th>Mahasiswa</th>
+                            <th>Nomor Virtual Account</th>
+                            <th>Nominal Tagihan</th>
+                            <th>Waktu & Kanal Bayar</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-end pe-4">Kelola Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($tagihanList as $tagihan)
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="badge-m3 {{ $tagihan->jenis_tagihan === 'WISUDA' ? 'badge-m3-primary' : 'badge-m3-neutral' }}" style="font-weight: 700; font-size: 0.7rem;">
+                                        {{ $tagihan->jenis_tagihan }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="font-family: var(--font-mono); color: var(--on-surface); font-size: 0.85rem;">{{ $tagihan->nomor_invoice }}</strong>
+                                    <div style="font-size: 0.7rem; color: var(--on-surface-variant);">
+                                        Terbit: {{ $tagihan->created_at->format('d/m/Y H:i') }}
                                     </div>
-                                    <small style="color: var(--on-surface-variant); font-size: 0.7rem;">
-                                        {{ $tagihan->channel_bayar ?? 'Virtual Account' }}
-                                    </small>
-                                @else
-                                    <span style="color: var(--outline-variant); font-size: 0.8rem;">-</span>
-                                @endif
-                            </td>
-                            <td style="text-align: center;">
-                                @if($tagihan->status_pembayaran === 'PAID')
-                                    <span class="badge-m3 badge-m3-success" style="font-size: 0.75rem; font-weight: 700;">
-                                        <i class="fas fa-circle-check me-1"></i> PAID
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--on-surface); font-size: 0.875rem;">
+                                        {{ $tagihan->mahasiswa->nama ?? 'Mahasiswa' }}
+                                    </div>
+                                    <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--on-surface-variant);">
+                                        NIM: {{ $tagihan->nim }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary); font-size: 0.9rem;">
+                                        {{ $tagihan->nomor_va }}
                                     </span>
-                                @else
-                                    <span class="badge-m3 badge-m3-error" style="font-size: 0.75rem; font-weight: 700;">
-                                        <i class="fas fa-clock me-1"></i> UNPAID
-                                    </span>
-                                @endif
-                            </td>
-                            <td style="text-align: right;">
-                                <form action="{{ route('billing.update_status', $tagihan->id) }}" method="POST" style="margin: 0; display: inline-block;">
-                                    @csrf
-                                    @if($tagihan->status_pembayaran === 'PAID')
-                                        <input type="hidden" name="status_pembayaran" value="UNPAID">
-                                        <button type="submit" class="btn-m3 btn-m3-outlined" style="height: 30px; padding: 0 10px; font-size: 0.72rem; border-color: var(--error); color: var(--error);" onclick="return confirm('Batalkan pelunasan tagihan ini?')">
-                                            <i class="fas fa-rotate-left"></i>
-                                            <span>Set UNPAID</span>
-                                        </button>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--on-surface); font-size: 0.9rem;">
+                                        Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    @if($tagihan->tanggal_bayar)
+                                        <div style="font-size: 0.8rem; color: var(--on-surface);">
+                                            {{ $tagihan->tanggal_bayar->format('d/m/Y H:i') }}
+                                        </div>
+                                        <small style="color: var(--on-surface-variant); font-size: 0.7rem;">
+                                            {{ $tagihan->channel_bayar ?? 'Virtual Account' }}
+                                        </small>
                                     @else
-                                        <input type="hidden" name="status_pembayaran" value="PAID">
-                                        <input type="hidden" name="channel_bayar" value="ADMIN_MANUAL_SET">
-                                        <button type="submit" class="btn-m3 btn-m3-tonal" style="height: 30px; padding: 0 10px; font-size: 0.72rem;">
-                                            <i class="fas fa-check"></i>
-                                            <span>Set LUNAS</span>
-                                        </button>
+                                        <span style="color: var(--outline-variant); font-size: 0.8rem;">-</span>
                                     @endif
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" style="text-align: center; padding: 36px; color: var(--on-surface-variant);">
-                                Tidak ada tagihan yang sesuai dengan filter pencarian.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                </td>
+                                <td class="text-center">
+                                    @if($tagihan->status_pembayaran === 'PAID')
+                                        <span class="badge-m3 badge-m3-success" style="font-size: 0.75rem; font-weight: 700;">
+                                            <i class="fas fa-circle-check me-1"></i> PAID
+                                        </span>
+                                    @else
+                                        <span class="badge-m3 badge-m3-error" style="font-size: 0.75rem; font-weight: 700;">
+                                            <i class="fas fa-clock me-1"></i> UNPAID
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="{{ route('billing.update_status', $tagihan->id) }}" method="POST" style="margin: 0; display: inline-block;">
+                                        @csrf
+                                        @if($tagihan->status_pembayaran === 'PAID')
+                                            <input type="hidden" name="status_pembayaran" value="UNPAID">
+                                            <button type="submit" class="btn-m3 btn-m3-outlined" style="height: 30px; padding: 0 10px; font-size: 0.72rem; border-color: var(--error); color: var(--error);" onclick="return confirm('Batalkan pelunasan tagihan ini?')">
+                                                <i class="fas fa-rotate-left"></i>
+                                                <span>Set UNPAID</span>
+                                            </button>
+                                        @else
+                                            <input type="hidden" name="status_pembayaran" value="PAID">
+                                            <input type="hidden" name="channel_bayar" value="ADMIN_MANUAL_SET">
+                                            <button type="submit" class="btn-m3 btn-m3-tonal" style="height: 30px; padding: 0 10px; font-size: 0.72rem;">
+                                                <i class="fas fa-check"></i>
+                                                <span>Set LUNAS</span>
+                                            </button>
+                                        @endif
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-4" style="color: var(--on-surface-variant);">
+                                    Tidak ada tagihan yang sesuai dengan filter pencarian.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {{-- Pagination --}}
         @if($tagihanList->hasPages())
-            <div style="padding: 16px 24px; border-top: 1px solid var(--outline-variant); display: flex; justify-content: center;">
+            <div class="px-4 py-3" style="border-top: 1px solid var(--outline-variant); display: flex; justify-content: center;">
                 {{ $tagihanList->links() }}
             </div>
         @endif

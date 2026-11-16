@@ -149,10 +149,10 @@ cmd_update() {
     if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR/.git" ]; then
         for candidate in \
             "$(pwd)" \
-            "$HOME/PROJECT EAI" "$HOME/PROJECT-EAI" "$HOME/eai" "$HOME/eai_project" \
-            "/root/PROJECT EAI" "/root/PROJECT-EAI" "/root/eai" "/root/eai_project" \
-            "/var/www/eai" "/var/www/project" \
-            /home/*/"PROJECT EAI" /home/*/"PROJECT-EAI" /home/*/"eai" \
+            "$HOME/project_eai" "$HOME/PROJECT EAI" "$HOME/PROJECT-EAI" "$HOME/eai" "$HOME/eai_project" \
+            "/root/project_eai" "/root/PROJECT EAI" "/root/PROJECT-EAI" "/root/eai" "/root/eai_project" \
+            "/var/www/project_eai" "/var/www/eai" "/var/www/project" \
+            /home/*/"project_eai" /home/*/"PROJECT EAI" /home/*/"PROJECT-EAI" /home/*/"eai" \
             "$(dirname "$(dirname "$(readlink -f "$0" 2>/dev/null || echo "")")")"; do
             if [ -d "$candidate/.git" ] && [ -d "$candidate/simak" ] && [ -d "$candidate/billing" ]; then
                 REPO_DIR="$candidate"
@@ -181,8 +181,15 @@ EOF
         fi
 
         echo -e "${CYAN}--> Git Commit sebelum update: ${BOLD}$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')${NC}"
-        echo -e "${CYAN}--> Menarik pembaruan dari remote Git...${NC}"
-        git pull origin main || git pull || echo -e "${YELLOW}Catatan: Git pull dilewati / tidak ada remote.${NC}"
+        echo -e "${CYAN}--> Menarik pembaruan dari remote Git (fetch & reset --hard)...${NC}"
+        git fetch origin main 2>/dev/null || git fetch origin 2>/dev/null || git fetch 2>/dev/null || true
+        if git rev-parse --verify origin/main >/dev/null 2>&1; then
+            git reset --hard origin/main
+        else
+            git reset --hard HEAD
+            git pull || true
+        fi
+        git clean -fd
         echo -e "${GREEN}--> Git Commit setelah update : ${BOLD}$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')${NC}\n"
 
         echo -e "${CYAN}--> Menyinkronkan berkas aplikasi ke direktori server web...${NC}"
@@ -273,8 +280,9 @@ EOF
         echo -e "${GREEN}✓ Total Billing System berhasil diperbarui.${NC}\n"
     fi
 
-    # 4. Reload services
-    systemctl reload "$PHP_SERVICE" 2>/dev/null || true
+    # 4. Restart layanan web & PHP-FPM untuk flushing OPcache
+    echo -e "${CYAN}--> Merestart PHP-FPM (${PHP_SERVICE}) untuk membersihkan OPcache...${NC}"
+    systemctl restart "$PHP_SERVICE" 2>/dev/null || true
     systemctl reload nginx 2>/dev/null || true
     echo -e "${GREEN}${BOLD}✓ Seluruh pembaruan aplikasi dan dependensi telah tuntas.${NC}"
 }

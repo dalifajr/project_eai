@@ -46,67 +46,69 @@
     </div>
 
     {{-- Course Table Card --}}
-    <div class="m3-card" style="padding: 0; overflow: hidden;">
-        <div class="table-container-modern">
-            <table class="table-m3" id="coursesTable">
-                <thead>
-                    <tr>
-                        <th style="width: 100px;">Kode MK</th>
-                        <th>Nama Mata Kuliah</th>
-                        <th style="text-align: center; width: 70px;">SKS</th>
-                        <th style="text-align: center; width: 90px;">Semester</th>
-                        <th>Jadwal Kuliah</th>
-                        <th>Ruangan</th>
-                        <th style="text-align: center; width: 90px;">Kuota</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($mataKuliahList as $mk)
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+        <div class="card-body p-0">
+            <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                <table class="table table-hover align-middle mb-0" id="coursesTable">
+                    <thead class="bg-light">
                         <tr>
-                            <td>
-                                <span class="badge-m3 badge-m3-neutral" style="font-family: var(--font-mono); font-weight: 700;">
-                                    {{ $mk->kode_mk }}
-                                </span>
-                            </td>
-                            <td>
-                                <strong style="color: var(--on-surface); font-size: 0.925rem;">{{ $mk->nama_mk }}</strong>
-                            </td>
-                            <td style="text-align: center;">
-                                <span class="badge-m3 badge-m3-primary" style="font-weight: 700;">
-                                    {{ $mk->sks }} SKS
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                <span class="badge-m3 badge-m3-neutral">
-                                    Sem {{ $mk->semester }}
-                                </span>
-                            </td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--on-surface);">
-                                    <i class="fas fa-clock text-primary"></i>
-                                    <span>{{ $mk->hari }}, {{ substr($mk->jam_mulai, 0, 5) }} - {{ substr($mk->jam_selesai, 0, 5) }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <span style="font-size: 0.85rem; color: var(--on-surface); font-weight: 500;">
-                                    <i class="fas fa-door-open me-1 text-secondary"></i> {{ $mk->ruangan }}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                <span class="badge-m3 badge-m3-info" style="font-weight: 600;">
-                                    {{ $mk->kuota }} Kursi
-                                </span>
-                            </td>
+                            <th class="ps-4" style="width: 100px;">Kode MK</th>
+                            <th>Nama Mata Kuliah</th>
+                            <th class="text-center" style="width: 70px;">SKS</th>
+                            <th class="text-center" style="width: 90px;">Semester</th>
+                            <th>Jadwal Kuliah</th>
+                            <th>Ruangan</th>
+                            <th class="text-end pe-4" style="width: 90px;">Kuota</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 32px; color: var(--on-surface-variant);">
-                                Tidak ada data mata kuliah tersedia.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($mataKuliahList as $mk)
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="badge-m3 badge-m3-neutral" style="font-family: var(--font-mono); font-weight: 700;">
+                                        {{ $mk->kode_mk }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--on-surface); font-size: 0.925rem;">{{ $mk->nama_mk }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge-m3 badge-m3-primary" style="font-weight: 700;">
+                                        {{ $mk->sks }} SKS
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge-m3 badge-m3-neutral">
+                                        Sem {{ $mk->semester }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--on-surface);">
+                                        <i class="fas fa-clock text-primary"></i>
+                                        <span>{{ $mk->hari }}, {{ substr($mk->jam_mulai, 0, 5) }} - {{ substr($mk->jam_selesai, 0, 5) }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-size: 0.85rem; color: var(--on-surface); font-weight: 500;">
+                                        <i class="fas fa-door-open me-1 text-secondary"></i> {{ $mk->ruangan }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <span class="badge-m3 badge-m3-info" style="font-weight: 600;">
+                                        {{ $mk->kuota }} Kursi
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-4" style="color: var(--on-surface-variant);">
+                                    Tidak ada data mata kuliah tersedia.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

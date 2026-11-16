@@ -724,60 +724,140 @@ code, kbd, samp, pre {
     color: var(--on-warning-container);
 }
 
-/* === M3 DATA TABLES === */
+/* === M3 DATA TABLES (GOOGLE CLOUD CONSOLE / M3 SPEC) === */
+.table-responsive,
 .table-container-modern,
+.table-container-fintech,
 .m3-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     background: var(--surface-container-lowest);
     border: 1px solid var(--outline-variant);
-    border-radius: var(--radius-md);
-    overflow: hidden;
+    border-radius: var(--radius-lg, 16px);
     margin-bottom: 24px;
 }
 
+.table,
+.table-m3,
+.m3-table,
 .table-modern,
-.m3-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13.5px;
+.table-fintech {
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    color: var(--on-surface) !important;
+    border-collapse: collapse !important;
+    font-size: 0.875rem !important;
     text-align: left;
+    vertical-align: middle;
 }
 
-.table-modern th,
-.m3-table th {
-    background: var(--surface-container-low);
-    color: var(--on-surface-variant);
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--outline-variant);
-}
-
-.table-modern td,
-.m3-table td {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--outline-variant);
+.table > :not(caption) > * > *,
+.table-m3 > :not(caption) > * > *,
+.m3-table > :not(caption) > * > *,
+.table th, .table td,
+.table-m3 th, .table-m3 td,
+.m3-table th, .m3-table td,
+.table-modern th, .table-modern td,
+.table-fintech th, .table-fintech td {
+    padding: 0.85rem 1.15rem !important;
+    border-bottom: 1px solid var(--outline-variant) !important;
+    background-color: transparent;
     color: var(--on-surface);
     vertical-align: middle;
 }
 
-.table-modern tr:last-child td,
-.m3-table tr:last-child td {
-    border-bottom: none;
+.table th,
+.table-m3 th,
+.m3-table th,
+.table-modern th,
+.table-fintech th {
+    font-family: var(--font-sans) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: var(--on-surface-variant) !important;
+    background-color: var(--surface-container-low) !important;
+    border-bottom: 1px solid var(--outline-variant) !important;
+    border-top: none !important;
+    white-space: nowrap !important;
 }
 
+.table td,
+.table-m3 td,
+.m3-table td,
+.table-modern td,
+.table-fintech td {
+    font-size: 0.875rem !important;
+    color: var(--on-surface) !important;
+}
+
+.table tbody tr,
+.table-m3 tbody tr,
+.m3-table tbody tr,
+.table-modern tbody tr,
+.table-fintech tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover,
+.table-m3 tbody tr:hover,
+.m3-table tbody tr:hover,
 .table-modern tbody tr:hover,
-.m3-table tbody tr:hover {
-    background: var(--surface-container);
+.table-fintech tbody tr:hover {
+    background-color: var(--surface-container-high) !important;
+}
+
+.table tbody tr:last-child td,
+.table-m3 tbody tr:last-child td,
+.m3-table tbody tr:last-child td,
+.table-modern tbody tr:last-child td,
+.table-fintech tbody tr:last-child td {
+    border-bottom: none !important;
 }
 
 /* === M3 INPUT & FORM FIELDS === */
+.input-m3,
+.form-control,
+.form-select,
 .m3-input,
 .m3-select,
 input[type="text"],
 input[type="password"],
 input[type="email"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-sm, 10px);
+    font-size: 14px;
+    font-family: var(--font-sans);
+    background: var(--surface-container-low);
+    color: var(--on-surface);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.input-m3:focus,
+.form-control:focus,
+.form-select:focus,
+.m3-input:focus,
+.m3-select:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+    background: var(--surface-container-lowest);
+}
 input[type="number"],
 select,
 textarea {

@@ -164,33 +164,37 @@
                             Sesuai regulasi kampus, mahasiswa yang memiliki tunggakan UKT atau denda dilarang mendaftar paket wisuda sampai seluruh kewajiban dilunasi.
                         </p>
 
-                        <div class="m3-table-container" style="margin-top: 16px; background: var(--surface-container-lowest);">
-                            <table class="m3-table">
-                                <thead>
-                                    <tr>
-                                        <th>Invoice ID</th>
-                                        <th>Keterangan Tagihan</th>
-                                        <th>Semester</th>
-                                        <th>Nominal</th>
-                                        <th>Nomor VA</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($tunggakan['detail'] as $row)
-                                    <tr>
-                                        <td><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px;">{{ $row['invoice_id'] }}</code></td>
-                                        <td><strong style="color: var(--on-surface);">{{ $row['deskripsi'] }}</strong></td>
-                                        <td>{{ $row['semester'] ?? '-' }}</td>
-                                        <td><strong>Rp {{ number_format($row['nominal'], 0, ',', '.') }}</strong></td>
-                                        <td><span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary);">{{ $row['nomor_va'] }}</span></td>
-                                    </tr>
-                                    @endforeach
-                                    <tr style="font-weight: 700; background: var(--surface-container-high);">
-                                        <td colspan="3" style="text-align: right; padding-right: 20px;">Total Kewajiban Wajib Dilunasi:</td>
-                                        <td colspan="2"><span style="font-size: 14px; color: var(--primary);">Rp {{ number_format($tunggakan['total_tunggakan'], 0, ',', '.') }}</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="card border-0 shadow-sm overflow-hidden my-3" style="border-radius: 12px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+                            <div class="card-body p-0">
+                                <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th class="ps-4">Invoice ID</th>
+                                                <th>Keterangan Tagihan</th>
+                                                <th>Semester</th>
+                                                <th>Nominal</th>
+                                                <th class="pe-4">Nomor VA</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($tunggakan['detail'] as $row)
+                                            <tr>
+                                                <td class="ps-4"><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">{{ $row['invoice_id'] }}</code></td>
+                                                <td><strong style="color: var(--on-surface);">{{ $row['deskripsi'] }}</strong></td>
+                                                <td>{{ $row['semester'] ?? '-' }}</td>
+                                                <td><strong>Rp {{ number_format($row['nominal'], 0, ',', '.') }}</strong></td>
+                                                <td class="pe-4"><span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary);">{{ $row['nomor_va'] }}</span></td>
+                                            </tr>
+                                            @endforeach
+                                            <tr style="font-weight: 700; background: var(--surface-container-high);">
+                                                <td colspan="3" class="ps-4" style="text-align: right; padding-right: 20px;">Total Kewajiban Wajib Dilunasi:</td>
+                                                <td colspan="2" class="pe-4"><span style="font-size: 14px; color: var(--primary);">Rp {{ number_format($tunggakan['total_tunggakan'], 0, ',', '.') }}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
                         <div style="margin-top: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">

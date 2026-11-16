@@ -111,128 +111,134 @@
 
         @if($krsAktif)
             <!-- Tampilan Kartu Rencana Studi Tersimpan -->
-            <div class="m3-card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
-                <div style="padding: 20px 24px; border-bottom: 1px solid var(--outline-variant); display: flex; justify-content: space-between; align-items: center;">
+            <div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius: 16px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 py-3" style="border-bottom: 1px solid var(--outline-variant) !important;">
                     <div>
-                        <h2 class="m3-card-title">Kartu Rencana Studi (KRS) Tersimpan</h2>
-                        <p class="m3-card-subtitle">Telah disetujui Dosen Pembimbing Akademik</p>
+                        <h3 class="mb-0 fw-bold" style="font-size: 1.05rem; color: var(--on-surface);">Kartu Rencana Studi (KRS) Tersimpan</h3>
+                        <small class="text-muted" style="color: var(--on-surface-variant) !important;">Telah disetujui Dosen Pembimbing Akademik</small>
                     </div>
                     <div>
-                        <a href="{{ route('krs.cetak') }}" target="_blank" class="btn-modern secondary sm">
-                            Cetak Draft KRS &rarr;
+                        <a href="{{ route('krs.cetak') }}" target="_blank" class="btn-m3 btn-m3-tonal" style="font-size: 0.8rem; height: 34px; padding: 0 14px;">
+                            <i class="fas fa-print me-1"></i>
+                            <span>Cetak Draft KRS</span>
                         </a>
                     </div>
                 </div>
 
-                <div class="m3-table-container" style="border: none; border-radius: 0; margin-bottom: 0;">
-                    <table class="m3-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px; text-align: center;">No</th>
-                                <th>Kode MK</th>
-                                <th>Nama Mata Kuliah</th>
-                                <th>Bobot</th>
-                                <th>Jadwal Kuliah</th>
-                                <th>Ruangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $no = 1; @endphp
-                            @foreach($krsAktif->details as $item)
-                            <tr>
-                                <td style="text-align: center; color: var(--on-surface-variant);">{{ $no++ }}</td>
-                                <td><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px;">{{ $item->mataKuliah->kode_mk }}</code></td>
-                                <td><strong style="color: var(--on-surface);">{{ $item->mataKuliah->nama_mk }}</strong></td>
-                                <td><span class="m3-badge-pill neutral">{{ $item->mataKuliah->sks }} SKS</span></td>
-                                <td>{{ $item->mataKuliah->hari }}, {{ substr($item->mataKuliah->jam_mulai, 0, 5) }} - {{ substr($item->mataKuliah->jam_selesai, 0, 5) }}</td>
-                                <td>{{ $item->mataKuliah->ruangan }}</td>
-                            </tr>
-                            @endforeach
-                            <tr style="background: var(--surface-container-low); font-weight: 700;">
-                                <td colspan="3" style="text-align: right; padding-right: 20px;">Total Beban SKS Terambil:</td>
-                                <td colspan="3">
-                                    <span class="m3-badge-pill success" style="font-size: 13px;">{{ $krsAktif->total_sks }} SKS</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card-body p-0">
+                    <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4" style="width: 50px; text-align: center;">No</th>
+                                    <th>Kode MK</th>
+                                    <th>Nama Mata Kuliah</th>
+                                    <th>Bobot</th>
+                                    <th>Jadwal Kuliah</th>
+                                    <th class="pe-4">Ruangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $no = 1; @endphp
+                                @foreach($krsAktif->details as $item)
+                                <tr>
+                                    <td class="ps-4" style="text-align: center; color: var(--on-surface-variant); font-size: 0.85rem;">{{ $no++ }}</td>
+                                    <td><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">{{ $item->mataKuliah->kode_mk }}</code></td>
+                                    <td><strong style="color: var(--on-surface);">{{ $item->mataKuliah->nama_mk }}</strong></td>
+                                    <td><span class="badge-m3 badge-m3-neutral">{{ $item->mataKuliah->sks }} SKS</span></td>
+                                    <td>{{ $item->mataKuliah->hari }}, {{ substr($item->mataKuliah->jam_mulai, 0, 5) }} - {{ substr($item->mataKuliah->jam_selesai, 0, 5) }}</td>
+                                    <td class="pe-4">{{ $item->mataKuliah->ruangan }}</td>
+                                </tr>
+                                @endforeach
+                                <tr style="background: var(--surface-container-low); font-weight: 700;">
+                                    <td colspan="3" class="ps-4" style="text-align: right; padding-right: 20px;">Total Beban SKS Terambil:</td>
+                                    <td colspan="3" class="pe-4">
+                                        <span class="badge-m3 badge-m3-success" style="font-size: 0.8rem;">{{ $krsAktif->total_sks }} SKS</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         @endif
 
         <!-- Form Pemilihan Mata Kuliah Tawaran -->
-        <div class="m3-card" style="padding: 0; overflow: hidden;">
-            <div style="padding: 22px 24px; border-bottom: 1px solid var(--outline-variant); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 py-3" style="border-bottom: 1px solid var(--outline-variant) !important;">
                 <div>
-                    <h2 class="m3-card-title">{{ $krsAktif ? 'Perbarui Pilihan Mata Kuliah' : 'Pilih Mata Kuliah Tawaran' }}</h2>
-                    <p class="m3-card-subtitle">
+                    <h3 class="mb-0 fw-bold" style="font-size: 1.05rem; color: var(--on-surface);">{{ $krsAktif ? 'Perbarui Pilihan Mata Kuliah' : 'Pilih Mata Kuliah Tawaran' }}</h3>
+                    <small class="text-muted" style="color: var(--on-surface-variant) !important;">
                         Batas Beban SKS Anda: <strong>{{ $mahasiswa->batas_sks }} SKS</strong> (Berdasarkan evaluasi akademik semester lalu)
-                    </p>
+                    </small>
                 </div>
 
                 <!-- Live Dynamic SKS Counter Badge -->
-                <div id="sks-counter-badge" class="m3-badge-pill neutral" style="font-size: 13px; padding: 6px 18px;">
+                <div id="sks-counter-badge" class="badge-m3 badge-m3-neutral" style="font-size: 0.85rem; padding: 6px 14px;">
                     SKS Dipilih: <strong id="selected-sks" style="margin-left: 4px; font-family: var(--font-mono);">0</strong> / {{ $mahasiswa->batas_sks }}
                 </div>
             </div>
 
             <form action="{{ route('krs.store') }}" method="POST" id="form-krs">
                 @csrf
-                <div class="m3-table-container" style="border: none; border-radius: 0; margin-bottom: 0;">
-                    <table class="m3-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px; text-align: center;">Pilih</th>
-                                <th>Kode</th>
-                                <th>Nama Mata Kuliah</th>
-                                <th>SKS</th>
-                                <th>Hari & Jam Kuliah</th>
-                                <th>Ruang</th>
-                                <th>Keterangan Jadwal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $selectedIds = $krsAktif ? $krsAktif->details->pluck('kode_mk')->toArray() : [];
-                            @endphp
-                            @foreach($mataKuliah as $mk)
-                            <tr class="mk-row">
-                                <td style="text-align: center;">
-                                    <input type="checkbox" name="mata_kuliah[]" value="{{ $mk->kode_mk }}"
-                                           data-sks="{{ $mk->sks }}"
-                                           data-hari="{{ $mk->hari }}"
-                                           data-mulai="{{ $mk->jam_mulai }}"
-                                           data-selesai="{{ $mk->jam_selesai }}"
-                                           class="mk-checkbox"
-                                           style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);"
-                                           {{ in_array($mk->kode_mk, $selectedIds) ? 'checked' : '' }}>
-                                </td>
-                                <td><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px;">{{ $mk->kode_mk }}</code></td>
-                                <td><strong style="color: var(--on-surface);">{{ $mk->nama_mk }}</strong></td>
-                                <td><span class="m3-badge-pill neutral">{{ $mk->sks }} SKS</span></td>
-                                <td>
-                                    <strong>{{ $mk->hari }}</strong>, {{ substr($mk->jam_mulai, 0, 5) }} - {{ substr($mk->jam_selesai, 0, 5) }}
-                                </td>
-                                <td>{{ $mk->ruangan }}</td>
-                                <td>
-                                    @if($mk->kode_mk === 'TIF701' || $mk->kode_mk === 'TIF702')
-                                        <span class="m3-badge-pill warning" style="font-size: 10px;">Senin 08:00 (Uji Bentrok)</span>
-                                    @else
-                                        <span style="font-size: 12px; color: var(--on-surface-variant);">Tersedia</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="card-body p-0">
+                    <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4" style="width: 50px; text-align: center;">Pilih</th>
+                                    <th>Kode</th>
+                                    <th>Nama Mata Kuliah</th>
+                                    <th>SKS</th>
+                                    <th>Hari & Jam Kuliah</th>
+                                    <th>Ruang</th>
+                                    <th class="pe-4">Keterangan Jadwal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $selectedIds = $krsAktif ? $krsAktif->details->pluck('kode_mk')->toArray() : [];
+                                @endphp
+                                @foreach($mataKuliah as $mk)
+                                <tr class="mk-row">
+                                    <td class="ps-4" style="text-align: center;">
+                                        <input type="checkbox" name="mata_kuliah[]" value="{{ $mk->kode_mk }}"
+                                               data-sks="{{ $mk->sks }}"
+                                               data-hari="{{ $mk->hari }}"
+                                               data-mulai="{{ $mk->jam_mulai }}"
+                                               data-selesai="{{ $mk->jam_selesai }}"
+                                               class="mk-checkbox"
+                                               style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);"
+                                               {{ in_array($mk->kode_mk, $selectedIds) ? 'checked' : '' }}>
+                                    </td>
+                                    <td><code style="background: var(--surface-container-high); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">{{ $mk->kode_mk }}</code></td>
+                                    <td><strong style="color: var(--on-surface);">{{ $mk->nama_mk }}</strong></td>
+                                    <td><span class="badge-m3 badge-m3-neutral">{{ $mk->sks }} SKS</span></td>
+                                    <td>
+                                        <strong>{{ $mk->hari }}</strong>, {{ substr($mk->jam_mulai, 0, 5) }} - {{ substr($mk->jam_selesai, 0, 5) }}
+                                    </td>
+                                    <td>{{ $mk->ruangan }}</td>
+                                    <td class="pe-4">
+                                        @if($mk->kode_mk === 'TIF701' || $mk->kode_mk === 'TIF702')
+                                            <span class="badge-m3 badge-m3-warning" style="font-size: 0.72rem;">Senin 08:00 (Uji Bentrok)</span>
+                                        @else
+                                            <span style="font-size: 0.8rem; color: var(--on-surface-variant);">Tersedia</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div style="padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--outline-variant); flex-wrap: wrap; gap: 12px;">
-                    <div style="font-size: 12.5px; color: var(--on-surface-variant);">
+                <div class="px-4 py-3" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--outline-variant); flex-wrap: wrap; gap: 12px; background: var(--surface-container-lowest);">
+                    <div style="font-size: 0.825rem; color: var(--on-surface-variant);">
                         Sistem EAI secara otomatis memvalidasi integritas jadwal dan batas kuota SKS.
                     </div>
-                    <button type="submit" class="btn-modern primary" id="btn-submit-krs">
-                        Simpan Rencana Studi (KRS) &rarr;
+                    <button type="submit" class="btn-m3 btn-m3-primary" id="btn-submit-krs">
+                        <span>Simpan Rencana Studi (KRS)</span>
+                        <i class="fas fa-arrow-right ms-1"></i>
                     </button>
                 </div>
             </form>

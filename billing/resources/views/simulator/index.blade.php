@@ -120,7 +120,7 @@
 
             <div style="margin-top: auto; padding-top: 16px;">
                 <a href="{{ route('billing.webhook_logs') }}" class="btn-m3 btn-m3-tonal" style="width: 100%;">
-                    <i class="fas fa-tower-broadcast"></i>
+                    <i class="fas fa-satellite-dish"></i>
                     <span>Pantau di Audit Log Webhook</span>
                 </a>
             </div>
@@ -129,70 +129,72 @@
     </div>
 
     {{-- Daftar Tagihan Belum Lunas (Quick Selection Table) --}}
-    <div class="m3-card" style="padding: 0; overflow: hidden;">
-        <div style="padding: 18px 24px; border-bottom: 1px solid var(--outline-variant); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2 px-4 py-3" style="border-bottom: 1px solid var(--outline-variant) !important;">
             <div>
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--on-surface); margin: 0;">
+                <h3 class="mb-0 fw-bold" style="font-size: 1.05rem; color: var(--on-surface);">
                     Daftar Tagihan Menunggu Pelunasan (UNPAID)
                 </h3>
-                <small style="color: var(--on-surface-variant);">Pilih salah satu baris untuk langsung mengisi form simulator di atas</small>
+                <small class="text-muted" style="color: var(--on-surface-variant) !important;">Pilih salah satu baris untuk langsung mengisi form simulator di atas</small>
             </div>
             <span class="badge-m3 badge-m3-warning" style="font-weight: 700;">
                 {{ $unpaidInvoices->count() }} Tagihan Tersedia
             </span>
         </div>
 
-        <div class="table-container-modern">
-            <table class="table-m3">
-                <thead>
-                    <tr>
-                        <th>Jenis</th>
-                        <th>Nomor Invoice</th>
-                        <th>Mahasiswa</th>
-                        <th>Nomor Virtual Account</th>
-                        <th>Nominal Tagihan</th>
-                        <th style="text-align: right;">Aksi Cepat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($unpaidInvoices as $inv)
+        <div class="card-body p-0">
+            <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <td>
-                                <span class="badge-m3 {{ $inv->jenis_tagihan === 'WISUDA' ? 'badge-m3-primary' : 'badge-m3-neutral' }}" style="font-weight: 700; font-size: 0.72rem;">
-                                    {{ $inv->jenis_tagihan }}
-                                </span>
-                            </td>
-                            <td>
-                                <strong style="font-family: var(--font-mono); color: var(--on-surface);">{{ $inv->nomor_invoice }}</strong>
-                            </td>
-                            <td>
-                                <div style="color: var(--on-surface); font-weight: 600;">{{ $inv->mahasiswa->nama ?? 'Mahasiswa' }}</div>
-                                <small style="font-family: var(--font-mono); color: var(--on-surface-variant);">NIM: {{ $inv->nim }}</small>
-                            </td>
-                            <td>
-                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary); font-size: 0.95rem;">
-                                    {{ $inv->nomor_va }}
-                                </span>
-                            </td>
-                            <td>
-                                <strong style="color: var(--on-surface);">Rp {{ number_format($inv->jumlah_tagihan, 0, ',', '.') }}</strong>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-m3 btn-m3-tonal" style="height: 32px; padding: 0 12px; font-size: 0.78rem;" onclick="setVA('{{ $inv->nomor_va }}')">
-                                    <i class="fas fa-hand-pointer"></i>
-                                    <span>Pilih VA Ini</span>
-                                </button>
-                            </td>
+                            <th class="ps-4">Jenis</th>
+                            <th>Nomor Invoice</th>
+                            <th>Mahasiswa</th>
+                            <th>Nomor Virtual Account</th>
+                            <th>Nominal Tagihan</th>
+                            <th class="text-end pe-4">Aksi Cepat</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" style="text-align: center; padding: 32px; color: var(--on-surface-variant);">
-                                Semua tagihan saat ini telah berstatus LUNAS (PAID).
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($unpaidInvoices as $inv)
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="badge-m3 {{ $inv->jenis_tagihan === 'WISUDA' ? 'badge-m3-primary' : 'badge-m3-neutral' }}" style="font-weight: 700; font-size: 0.72rem;">
+                                        {{ $inv->jenis_tagihan }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="font-family: var(--font-mono); color: var(--on-surface);">{{ $inv->nomor_invoice }}</strong>
+                                </td>
+                                <td>
+                                    <div style="color: var(--on-surface); font-weight: 600;">{{ $inv->mahasiswa->nama ?? 'Mahasiswa' }}</div>
+                                    <small style="font-family: var(--font-mono); color: var(--on-surface-variant);">NIM: {{ $inv->nim }}</small>
+                                </td>
+                                <td>
+                                    <span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary); font-size: 0.95rem;">
+                                        {{ $inv->nomor_va }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong style="color: var(--on-surface);">Rp {{ number_format($inv->jumlah_tagihan, 0, ',', '.') }}</strong>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button type="button" class="btn-m3 btn-m3-tonal" style="height: 32px; padding: 0 12px; font-size: 0.78rem;" onclick="setVA('{{ $inv->nomor_va }}')">
+                                        <i class="fas fa-hand-pointer"></i>
+                                        <span>Pilih VA Ini</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4" style="color: var(--on-surface-variant);">
+                                    Semua tagihan saat ini telah berstatus LUNAS (PAID).
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

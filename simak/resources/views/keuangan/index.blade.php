@@ -13,7 +13,7 @@
             <div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
                     <span class="badge-m3 badge-m3-success" style="font-size: 0.72rem;">
-                        <i class="fas fa-tower-broadcast me-1"></i> EAI REST API ACTIVE
+                        <i class="fas fa-satellite-dish me-1"></i> EAI REST API ACTIVE
                     </span>
                     <span style="font-size: 0.8rem; color: var(--on-surface-variant);">Sinkronisasi Otomatis dengan Total Billing System</span>
                 </div>

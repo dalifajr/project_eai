@@ -43,97 +43,99 @@
     </div>
 
     {{-- Students Table Card --}}
-    <div class="m3-card" style="padding: 0; overflow: hidden;">
-        <div class="table-container-modern">
-            <table class="table-m3" id="studentsTable">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">No</th>
-                        <th>Mahasiswa</th>
-                        <th>Program Studi</th>
-                        <th>Semester</th>
-                        <th>IPS / Beban</th>
-                        <th>Status Prasyarat</th>
-                        <th>Wisuda</th>
-                        <th style="text-align: right;">Aksi Uji EAI</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($allMahasiswa as $index => $mhs)
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+        <div class="card-body p-0">
+            <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                <table class="table table-hover align-middle mb-0" id="studentsTable">
+                    <thead class="bg-light">
                         <tr>
-                            <td style="font-family: var(--font-mono); color: var(--on-surface-variant); font-size: 0.825rem;">
-                                {{ $index + 1 }}
-                            </td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--primary-container); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">
-                                        {{ strtoupper(substr($mhs->nama, 0, 1)) }}
+                            <th class="ps-4" style="width: 50px;">No</th>
+                            <th>Mahasiswa</th>
+                            <th>Program Studi</th>
+                            <th>Semester</th>
+                            <th>IPS / Beban</th>
+                            <th>Status Prasyarat</th>
+                            <th>Wisuda</th>
+                            <th class="text-end pe-4">Aksi Uji EAI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($allMahasiswa as $index => $mhs)
+                            <tr>
+                                <td class="ps-4" style="font-family: var(--font-mono); color: var(--on-surface-variant); font-size: 0.825rem;">
+                                    {{ $index + 1 }}
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--primary-container); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">
+                                            {{ strtoupper(substr($mhs->nama, 0, 1)) }}
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                                            <strong style="color: var(--on-surface); font-size: 0.9rem;">{{ $mhs->nama }}</strong>
+                                            <span style="font-family: var(--font-mono); font-size: 0.775rem; color: var(--on-surface-variant);">
+                                                NIM: {{ $mhs->nim }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                                        <strong style="color: var(--on-surface); font-size: 0.9rem;">{{ $mhs->nama }}</strong>
-                                        <span style="font-family: var(--font-mono); font-size: 0.775rem; color: var(--on-surface-variant);">
-                                            NIM: {{ $mhs->nim }}
+                                </td>
+                                <td>
+                                    <div style="font-size: 0.85rem; color: var(--on-surface);">{{ $mhs->program_studi }}</div>
+                                    <small style="color: var(--on-surface-variant);">Angkatan {{ $mhs->angkatan }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge-m3 badge-m3-neutral" style="font-weight: 700;">
+                                        Sem {{ $mhs->semester_sekarang }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">
+                                        IPS: {{ number_format($mhs->ips_lalu, 2) }}
+                                    </div>
+                                    <small style="color: var(--on-surface-variant);">Maks {{ $mhs->batas_sks }} SKS</small>
+                                </td>
+                                <td>
+                                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                                        <span style="font-size: 0.75rem;">
+                                            Skripsi: <strong>{{ $mhs->status_skripsi }}</strong>
+                                        </span>
+                                        <span style="font-size: 0.72rem; color: var(--on-surface-variant);">
+                                            Lab: {!! $mhs->bebas_lab ? '<span class="text-success fw-bold">Bebas</span>' : '<span class="text-danger">Belum</span>' !!} &bull; 
+                                            Pus: {!! $mhs->bebas_perpustakaan ? '<span class="text-success fw-bold">Bebas</span>' : '<span class="text-danger">Belum</span>' !!}
                                         </span>
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div style="font-size: 0.85rem; color: var(--on-surface);">{{ $mhs->program_studi }}</div>
-                                <small style="color: var(--on-surface-variant);">Angkatan {{ $mhs->angkatan }}</small>
-                            </td>
-                            <td>
-                                <span class="badge-m3 badge-m3-neutral" style="font-weight: 700;">
-                                    Sem {{ $mhs->semester_sekarang }}
-                                </span>
-                            </td>
-                            <td>
-                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">
-                                    IPS: {{ number_format($mhs->ips_lalu, 2) }}
-                                </div>
-                                <small style="color: var(--on-surface-variant);">Maks {{ $mhs->batas_sks }} SKS</small>
-                            </td>
-                            <td>
-                                <div style="display: flex; flex-direction: column; gap: 2px;">
-                                    <span style="font-size: 0.75rem;">
-                                        Skripsi: <strong>{{ $mhs->status_skripsi }}</strong>
-                                    </span>
-                                    <span style="font-size: 0.72rem; color: var(--on-surface-variant);">
-                                        Lab: {!! $mhs->bebas_lab ? '<span class="text-success fw-bold">Bebas</span>' : '<span class="text-danger">Belum</span>' !!} &bull; 
-                                        Pus: {!! $mhs->bebas_perpustakaan ? '<span class="text-success fw-bold">Bebas</span>' : '<span class="text-danger">Belum</span>' !!}
-                                    </span>
-                                </div>
-                            </td>
-                            <td>
-                                @if($mhs->pendaftaranWisuda)
-                                    @if($mhs->pendaftaranWisuda->status_pembayaran_wisuda === 'PAID')
-                                        <span class="badge-m3 badge-m3-success" style="font-size: 0.75rem;">PAID</span>
+                                </td>
+                                <td>
+                                    @if($mhs->pendaftaranWisuda)
+                                        @if($mhs->pendaftaranWisuda->status_pembayaran_wisuda === 'PAID')
+                                            <span class="badge-m3 badge-m3-success" style="font-size: 0.75rem;">PAID</span>
+                                        @else
+                                            <span class="badge-m3 badge-m3-warning" style="font-size: 0.75rem;">UNPAID</span>
+                                        @endif
                                     @else
-                                        <span class="badge-m3 badge-m3-warning" style="font-size: 0.75rem;">UNPAID</span>
+                                        <span style="font-size: 0.75rem; color: var(--outline-variant);">-</span>
                                     @endif
-                                @else
-                                    <span style="font-size: 0.75rem; color: var(--outline-variant);">-</span>
-                                @endif
-                            </td>
-                            <td style="text-align: right;">
-                                @if($mhs->user)
-                                    <a href="{{ route('quick.login', $mhs->user->username) }}" class="btn-m3 btn-m3-tonal" style="font-size: 0.78rem; height: 32px; padding: 0 12px;" title="Login sebagai {{ $mhs->nama }}">
-                                        <i class="fas fa-right-to-bracket"></i>
-                                        <span>Login As</span>
-                                    </a>
-                                @else
-                                    <span style="font-size: 0.75rem; color: var(--outline-variant);">No User</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" style="text-align: center; padding: 32px; color: var(--on-surface-variant);">
-                                Tidak ada data mahasiswa ditemukan.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                </td>
+                                <td class="text-end pe-4">
+                                    @if($mhs->user)
+                                        <a href="{{ route('quick.login', $mhs->user->username) }}" class="btn-m3 btn-m3-tonal" style="font-size: 0.78rem; height: 32px; padding: 0 12px;" title="Login sebagai {{ $mhs->nama }}">
+                                            <i class="fas fa-right-to-bracket"></i>
+                                            <span>Login As</span>
+                                        </a>
+                                    @else
+                                        <span style="font-size: 0.75rem; color: var(--outline-variant);">No User</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-4" style="color: var(--on-surface-variant);">
+                                    Tidak ada data mahasiswa ditemukan.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

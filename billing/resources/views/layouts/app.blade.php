@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     {{-- M3 Expressive Fintech / Flat Material You Design System --}}
-    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}?v=2.3">
+    <link rel="stylesheet" href="{{ asset('css/m3-material-you.css') }}?v={{ file_exists(public_path('css/m3-material-you.css')) ? filemtime(public_path('css/m3-material-you.css')) : '3.0' }}">
 
     @stack('styles')
 </head>
@@ -281,7 +281,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     {{-- Application JS (Theme Toggle & M3 Sidebar / Mobile Bottom Sheet gestures) --}}
-    <script src="{{ asset('js/app.js') }}?v=2.3"></script>
+    <script src="{{ asset('js/app.js') }}?v={{ file_exists(public_path('js/app.js')) ? filemtime(public_path('js/app.js')) : '3.0' }}"></script>
 
     @stack('scripts')
 </body>

@@ -12,7 +12,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
             <div>
                 <span class="badge-m3 badge-m3-info" style="margin-bottom: 8px;">
-                    <i class="fas fa-tower-broadcast me-1"></i> EAI DISPATCH AUDIT TRAIL
+                    <i class="fas fa-satellite-dish me-1"></i> EAI DISPATCH AUDIT TRAIL
                 </span>
                 <h2 style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--on-surface); margin: 4px 0 0 0;">
                     Log Transmisi Webhook Realtime
@@ -49,83 +49,85 @@
     </div>
 
     {{-- Webhook Logs Table --}}
-    <div class="m3-card" style="padding: 0; overflow: hidden;">
-        <div class="table-container-modern">
-            <table class="table-m3">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">No</th>
-                        <th>Event Name</th>
-                        <th>Target Endpoint URL</th>
-                        <th style="text-align: center; width: 110px;">HTTP Status</th>
-                        <th style="text-align: center; width: 110px;">Status</th>
-                        <th>Waktu Transmisi</th>
-                        <th style="text-align: right; width: 120px;">Payload</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($webhookLogs as $index => $log)
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 16px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant) !important;">
+        <div class="card-body p-0">
+            <div class="table-responsive mb-0" style="border: none; border-radius: 0;">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <td style="font-family: var(--font-mono); color: var(--on-surface-variant); font-size: 0.8rem;">
-                                {{ $webhookLogs->firstItem() + $index }}
-                            </td>
-                            <td>
-                                <strong style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--primary);">
-                                    {{ $log->event_name }}
-                                </strong>
-                            </td>
-                            <td>
-                                <span style="font-family: var(--font-mono); font-size: 0.775rem; color: var(--on-surface-variant); word-break: break-all;">
-                                    {{ $log->target_url }}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                <span class="badge-m3 {{ $log->response_code >= 200 && $log->response_code < 300 ? 'badge-m3-success' : 'badge-m3-error' }}" style="font-family: var(--font-mono); font-weight: 700;">
-                                    HTTP {{ $log->response_code }}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                @if($log->is_success)
-                                    <span class="badge-m3 badge-m3-success" style="font-size: 0.72rem; font-weight: 700;">
-                                        SUCCESS
-                                    </span>
-                                @else
-                                    <span class="badge-m3 badge-m3-error" style="font-size: 0.72rem; font-weight: 700;">
-                                        FAILED
-                                    </span>
-                                @endif
-                            </td>
-                            <td>
-                                <div style="font-size: 0.8rem; color: var(--on-surface);">
-                                    {{ $log->created_at->format('d/m/Y H:i:s') }}
-                                </div>
-                                <small style="color: var(--on-surface-variant); font-size: 0.7rem;">
-                                    {{ $log->created_at->diffForHumans() }}
-                                </small>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-m3 btn-m3-tonal" style="height: 30px; padding: 0 10px; font-size: 0.72rem;" onclick="viewPayload('{{ $log->id }}')">
-                                    <i class="fas fa-code"></i>
-                                    <span>Detail</span>
-                                </button>
-                                {{-- Hidden payload data for modal --}}
-                                <div id="payloadData_{{ $log->id }}" style="display: none;" data-payload="{{ $log->payload }}" data-response="{{ $log->response_body }}"></div>
-                            </td>
+                            <th class="ps-4" style="width: 50px;">No</th>
+                            <th>Event Name</th>
+                            <th>Target Endpoint URL</th>
+                            <th class="text-center" style="width: 110px;">HTTP Status</th>
+                            <th class="text-center" style="width: 110px;">Status</th>
+                            <th>Waktu Transmisi</th>
+                            <th class="text-end pe-4" style="width: 120px;">Payload</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 36px; color: var(--on-surface-variant);">
-                                Belum ada log pengiriman webhook tercatat.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($webhookLogs as $index => $log)
+                            <tr>
+                                <td class="ps-4" style="font-family: var(--font-mono); color: var(--on-surface-variant); font-size: 0.8rem;">
+                                    {{ $webhookLogs->firstItem() + $index }}
+                                </td>
+                                <td>
+                                    <strong style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--primary);">
+                                        {{ $log->event_name }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <span style="font-family: var(--font-mono); font-size: 0.775rem; color: var(--on-surface-variant); word-break: break-all;">
+                                        {{ $log->target_url }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge-m3 {{ $log->response_code >= 200 && $log->response_code < 300 ? 'badge-m3-success' : 'badge-m3-error' }}" style="font-family: var(--font-mono); font-weight: 700;">
+                                        HTTP {{ $log->response_code }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    @if($log->is_success)
+                                        <span class="badge-m3 badge-m3-success" style="font-size: 0.72rem; font-weight: 700;">
+                                            SUCCESS
+                                        </span>
+                                    @else
+                                        <span class="badge-m3 badge-m3-error" style="font-size: 0.72rem; font-weight: 700;">
+                                            FAILED
+                                        </span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div style="font-size: 0.8rem; color: var(--on-surface);">
+                                        {{ $log->created_at->format('d/m/Y H:i:s') }}
+                                    </div>
+                                    <small style="color: var(--on-surface-variant); font-size: 0.7rem;">
+                                        {{ $log->created_at->diffForHumans() }}
+                                    </small>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button type="button" class="btn-m3 btn-m3-tonal" style="height: 30px; padding: 0 10px; font-size: 0.72rem;" onclick="viewPayload('{{ $log->id }}')">
+                                        <i class="fas fa-code"></i>
+                                        <span>Detail</span>
+                                    </button>
+                                    {{-- Hidden payload data for modal --}}
+                                    <div id="payloadData_{{ $log->id }}" style="display: none;" data-payload="{{ $log->payload }}" data-response="{{ $log->response_body }}"></div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-4" style="color: var(--on-surface-variant);">
+                                    Belum ada log pengiriman webhook tercatat.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         {{-- Pagination --}}
         @if($webhookLogs->hasPages())
-            <div style="padding: 16px 24px; border-top: 1px solid var(--outline-variant); display: flex; justify-content: center;">
+            <div class="px-4 py-3" style="border-top: 1px solid var(--outline-variant); display: flex; justify-content: center;">
                 {{ $webhookLogs->links() }}
             </div>
         @endif
